@@ -26,8 +26,8 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include <Arduino.h>
 #include <sys/time.h>
 #include "EVEopenHAB.h"
-#include "Config.h"
-#include "Wifi.h"
+#include "EOConfig.h"
+#include "EOWifi.h"
 
 namespace EVEopenHAB
 {

@@ -1,6 +1,6 @@
 /*
-@file    Config.cpp
-@brief   Contains Config definitions
+@file    Wifi.cpp
+@brief   Contains Wifi definitions
 @date    2021-08-18
 @author  Olivier Sannier
 
@@ -24,27 +24,23 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 */
 
 #include <Arduino.h>
-#include <FS.h>
-#include <LITTLEFS.h>
-#include "Config.h"
+#include <Wifi.h>
+#include "EOWifi.h"
 
 namespace EVEopenHAB 
 {
-    namespace Config
+    namespace Wifi
     {
         void Setup()
         {
-            Serial.print(F("Loading persistent filesystem... "));
+            WiFi.onEvent(eventHandler_WiFiStationConnected, SYSTEM_EVENT_STA_CONNECTED);
+            WiFi.onEvent(eventHandler_WiFiStationGotIp, SYSTEM_EVENT_STA_GOT_IP);
+            WiFi.onEvent(eventHandler_WiFiStationLostIp, SYSTEM_EVENT_STA_LOST_IP);
+        }
 
-            if (!LITTLEFS.begin(true))
-            {
-                Serial.println(F(" FAILED!!"));
-                return;
-            }
-            Serial.print(F("OK. "));
-
-            Serial.printf_P(PSTR("File system usage: %u/%uKB.\r\n"), LITTLEFS.usedBytes() / 1024, LITTLEFS.totalBytes() / 1024);
-
+        void MainLoop()
+        {
+            
         }
     }
 }
