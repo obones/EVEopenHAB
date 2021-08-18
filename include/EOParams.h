@@ -1,5 +1,5 @@
 /*
-@file    EVEopenHAB.h
+@file    EOParams.h
 @brief   Contains Params declarations
 @date    2021-08-18
 @author  Olivier Sannier
@@ -22,8 +22,8 @@ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMA
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 */
-#ifndef EVEOPENHAB_H
-#define EVEOPENHAB_H
+#ifndef EOPARAMS_H
+#define EOPARAMS_H
 
 #include <WString.h>
 
