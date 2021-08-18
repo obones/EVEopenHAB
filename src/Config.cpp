@@ -24,6 +24,8 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 */
 
 #include <Arduino.h>
+#include <FS.h>
+#include <LITTLEFS.h>
 #include "Config.h"
 
 namespace EVEopenHAB 
@@ -32,7 +34,17 @@ namespace EVEopenHAB
     {
         void Setup()
         {
-            
+            Serial.print(F("Loading persistent filesystem... "));
+
+            if (!LITTLEFS.begin(true))
+            {
+                Serial.println(F(" FAILED!!"));
+                return;
+            }
+            Serial.print(F("OK. "));
+
+            Serial.printf_P(PSTR("File system usage: %u/%uKB.\r\n"), LITTLEFS.usedBytes() / 1024, LITTLEFS.totalBytes() / 1024);
+
         }
     }
 }
