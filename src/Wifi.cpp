@@ -24,7 +24,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 */
 
 #include <Arduino.h>
-#include "Wifi.h"
+#include <Wifi.h>
 
 namespace EVEopenHAB 
 {
@@ -32,7 +32,9 @@ namespace EVEopenHAB
     {
         void Setup()
         {
-            
+            WiFi.onEvent(eventHandler_WiFiStationConnected, SYSTEM_EVENT_STA_CONNECTED);
+            WiFi.onEvent(eventHandler_WiFiStationGotIp, SYSTEM_EVENT_STA_GOT_IP);
+            WiFi.onEvent(eventHandler_WiFiStationLostIp, SYSTEM_EVENT_STA_LOST_IP);
         }
 
         void MainLoop()
