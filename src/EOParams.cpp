@@ -29,7 +29,7 @@ namespace EVEopenHAB
 {
     namespace Params
     {
-        String ntpServer("pool.ntp.org");
+        String NTPServer("pool.ntp.org");
     }
 }
 
