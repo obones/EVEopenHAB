@@ -1,0 +1,11 @@
+// This is the template file for user settings
+// Copy it over to UserSettings.h but never add it to source control as it will contain sensitive data
+
+#define WIFI_SSID            "WifiSSID"
+#define WIFI_PASSWORD        "WifiPassword"
+#define WIFI_USE_DHCP        true
+#define WIFI_DHCP_NAME       "EVEopenHAB"
+#define WIFI_STATIC_IP       "1.2.3.4"
+#define WIFI_STATIC_MASK     "255.255.255.0"
+#define WIFI_STATIC_GATEWAY  "255.255.255.0"
+#define WIFI_STATIC_DNS      "1.1.1.1"
