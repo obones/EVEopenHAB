@@ -73,13 +73,16 @@ namespace EVEopenHAB
     {
         if (readyState == 4)
         {
-            Serial.println(F("Received a response, processing"));
+            Serial.println(F("Received a response, processing..."));
+            Serial.print(F("  HTTP response code: "));
+            Serial.println(request->responseHTTPcode());
+
             String responseText = request->responseText();
             Serial.println(responseText);
             Serial.println();
             request->setDebug(false);
 
-            if (request->responseHTTPcode == 200)
+            if (request->responseHTTPcode() == 200)
             {
                 Serial.println(F("Deserializing JSON"));
                 StaticJsonDocument<96> doc;
