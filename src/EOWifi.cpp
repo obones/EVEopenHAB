@@ -31,21 +31,24 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include "EOWifi.h"
 #include "EOParams.h"
 
+// If you get an error complaining about this file being missing, please create it using the template file located in the include folder
+#include "UserSettings.h"
+
 namespace EVEopenHAB 
 {
     namespace Wifi
     {
         namespace params {
 
-            String client_ssid;
-            String client_password;
+            String client_ssid = WIFI_SSID;
+            String client_password = WIFI_PASSWORD;
 
-            bool client_dhcp_enabled = true;
-            String client_ip;
-            String client_mask;
-            String client_gateway;
-            String client_dns;
-            String client_hostname;
+            bool client_dhcp_enabled = WIFI_USE_DHCP;
+            String client_ip = WIFI_STATIC_IP;
+            String client_mask = WIFI_STATIC_MASK;
+            String client_gateway = WIFI_STATIC_GATEWAY;
+            String client_dns = WIFI_STATIC_DNS;
+            String client_hostname = WIFI_DHCP_NAME;
         }
 
         void resetClientWifi() 
