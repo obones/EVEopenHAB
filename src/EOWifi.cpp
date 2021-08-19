@@ -141,35 +141,35 @@ namespace EVEopenHAB
         void eventHandler_WiFiStationConnected(WiFiEvent_t event, WiFiEventInfo_t info) 
         {
 
-          Serial.print(F("Connected to AP SSID:"));
-          for(int i = 0; i < info.connected.ssid_len; i++)
-            Serial.print((char) info.connected.ssid[i]);
+            Serial.print(F("Connected to AP SSID:"));
+            for(int i = 0; i < info.connected.ssid_len; i++)
+                Serial.print((char) info.connected.ssid[i]);
 
-          Serial.print("  BSSID: ");
-          for(int i = 0; i < 6; i++)
-          {
-            Serial.printf("%02X", info.connected.bssid[i]);
+            Serial.print("  BSSID: ");
+            for(int i = 0; i < 6; i++)
+            {
+                Serial.printf("%02X", info.connected.bssid[i]);
 
-            if (i < 5)
-              Serial.print(":");
-          }
+                if (i < 5)
+                    Serial.print(":");
+            }
 
-          Serial.print(F("  Channel: "));
-          Serial.print(info.connected.channel);
+            Serial.print(F("  Channel: "));
+            Serial.print(info.connected.channel);
 
-          Serial.print(F("  Auth mode: "));
-          Serial.println(info.connected.authmode);
+            Serial.print(F("  Auth mode: "));
+            Serial.println(info.connected.authmode);
         }
 
         void eventHandler_WiFiStationGotIp(WiFiEvent_t event, WiFiEventInfo_t info) 
         {
-          Serial.printf_P(PSTR("WiFi Client has received a new IP: %s\r\n"), WiFi.localIP().toString().c_str());
-          reconnectServices();
+            Serial.printf_P(PSTR("WiFi Client has received a new IP: %s\r\n"), WiFi.localIP().toString().c_str());
+            reconnectServices();
         }
 
         void eventHandler_WiFiStationLostIp(WiFiEvent_t event, WiFiEventInfo_t info) 
         {
-          Serial.println("WiFi Client has lost its IP");
+            Serial.println("WiFi Client has lost its IP");
         }
 
         void Setup()
