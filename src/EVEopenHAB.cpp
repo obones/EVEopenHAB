@@ -73,6 +73,7 @@ namespace EVEopenHAB
     {
         if (readyState == 4)
         {
+            Serial.println(F("Received a response, processing"));
             String responseText = request->responseText();
             Serial.println(responseText);
             Serial.println();
@@ -104,6 +105,7 @@ namespace EVEopenHAB
 
         if ((WiFi.status() == WL_CONNECTED) && !requestSent)
         {
+            Serial.println(F("Requesting the sitemap"));
             asyncHTTPrequest request;
             request.setDebug(true);
             request.onReadyStateChange(requestReadyStateChange);
