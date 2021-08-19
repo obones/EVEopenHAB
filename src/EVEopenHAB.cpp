@@ -78,15 +78,19 @@ namespace EVEopenHAB
             Serial.println();
             request->setDebug(false);
 
-            StaticJsonDocument<96> doc;
-
-            DeserializationError error = deserializeJson(doc, responseText.c_str(), responseText.length());
-
-            if (error) 
+            if (request->responseHTTPcode == 200)
             {
-                Serial.print(F("deserializeJson() failed: "));
-                Serial.println(error.f_str());
-                return;
+                Serial.println(F("Deserializing JSON"));
+                StaticJsonDocument<96> doc;
+
+                DeserializationError error = deserializeJson(doc, responseText.c_str(), responseText.length());
+
+                if (error) 
+                {
+                    Serial.print(F("deserializeJson() failed: "));
+                    Serial.println(error.f_str());
+                    return;
+                }
             }
         }
     }    
