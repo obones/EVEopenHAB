@@ -1,5 +1,5 @@
 /*
-@file    Config.h
+@file    EOConfig.h
 @brief   Contains Config declarations
 @date    2021-08-18
 @author  Olivier Sannier

@@ -1,5 +1,5 @@
 /*
-@file    Wifi.h
+@file    EOWifi.h
 @brief   Contains Wifi declarations
 @date    2021-08-18
 @author  Olivier Sannier
