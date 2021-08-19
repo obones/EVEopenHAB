@@ -27,6 +27,8 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include <sys/time.h>
 #include <WiFi.h>
 #include <asyncHTTPrequest.h>
+#include <WString.h>
+#include <ArduinoJson.h>
 #include "EVEopenHAB.h"
 #include "EOConfig.h"
 #include "EOWifi.h"
@@ -69,11 +71,23 @@ namespace EVEopenHAB
 
     void requestReadyStateChange(void* optParm, asyncHTTPrequest* request, int readyState)
     {
-        if(readyState == 4)
+        if (readyState == 4)
         {
-            Serial.println(request->responseText());
+            String responseText = request->responseText();
+            Serial.println(responseText);
             Serial.println();
             request->setDebug(false);
+
+            StaticJsonDocument<96> doc;
+
+            DeserializationError error = deserializeJson(doc, responseText.c_str(), responseText.length());
+
+            if (error) 
+            {
+                Serial.print(F("deserializeJson() failed: "));
+                Serial.println(error.f_str());
+                return;
+            }
         }
     }    
 
