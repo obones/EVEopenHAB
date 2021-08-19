@@ -25,9 +25,12 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 #include <Arduino.h>
 #include <sys/time.h>
+#include <WiFi.h>
+#include <asyncHTTPrequest.h>
 #include "EVEopenHAB.h"
 #include "EOConfig.h"
 #include "EOWifi.h"
+#include "EOSettings.h"
 
 namespace EVEopenHAB
 {
@@ -64,9 +67,32 @@ namespace EVEopenHAB
         //EVEopenHAB::Portal::Start();
     }
 
+    void requestReadyStateChange(void* optParm, asyncHTTPrequest* request, int readyState)
+    {
+        if(readyState == 4)
+        {
+            Serial.println(request->responseText());
+            Serial.println();
+            request->setDebug(false);
+        }
+    }    
+
+    bool requestSent = false;
+
     void MainLoop()
     {
         EVEopenHAB::Wifi::MainLoop();
         //OTA::mainLoop();
+
+        if ((WiFi.status() == WL_CONNECTED) && !requestSent)
+        {
+            asyncHTTPrequest request;
+            request.setDebug(true);
+            request.onReadyStateChange(requestReadyStateChange);
+            request.open("GET", SitemapURL);
+            request.send();
+
+            requestSent = true;
+        }
     }
 }
