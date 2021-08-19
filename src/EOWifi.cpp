@@ -30,9 +30,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include "EVEopenHAB.h"
 #include "EOWifi.h"
 #include "EOParams.h"
-
-// If you get an error complaining about this file being missing, please create it using the template file located in the include folder
-#include "UserSettings.h"
+#include "EOSettings.h"
 
 namespace EVEopenHAB 
 {
