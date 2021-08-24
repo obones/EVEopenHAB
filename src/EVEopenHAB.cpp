@@ -69,6 +69,8 @@ namespace EVEopenHAB
         //EVEopenHAB::Portal::Start();
     }
 
+    bool requestSent = false;
+
     void requestReadyStateChange(void* optParm, asyncHTTPrequest* request, int readyState)
     {
         if (readyState == 4)
@@ -96,10 +98,12 @@ namespace EVEopenHAB
                     return;
                 }
             }
+            else
+            {
+                requestSent = false;
+            }
         }
     }    
-
-    bool requestSent = false;
 
     void MainLoop()
     {
@@ -108,14 +112,14 @@ namespace EVEopenHAB
 
         if ((WiFi.status() == WL_CONNECTED) && !requestSent)
         {
+            requestSent = true;
+
             Serial.println(F("Requesting the sitemap"));
             asyncHTTPrequest request;
             request.setDebug(true);
             request.onReadyStateChange(requestReadyStateChange);
             request.open("GET", SitemapURL);
             request.send();
-
-            requestSent = true;
         }
     }
 }
