@@ -34,6 +34,14 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include "EOWifi.h"
 #include "EOSettings.h"
 
+#include <EVE.h>
+#include <EVE_commands.h>
+#include <EVE_target.h>
+#include <EVE_config.h>
+
+#define BLACK	0x000000UL
+#define WHITE	0xffffffUL
+
 namespace EVEopenHAB
 {
     struct timeval timeAtBoot;
@@ -67,6 +75,64 @@ namespace EVEopenHAB
         EVEopenHAB::Wifi::Setup();
 
         //EVEopenHAB::Portal::Start();
+
+        // EVE setup
+        Serial.println("Setting up EVE...");
+        Serial.println("    Pins");
+        pinMode(EVE_CS, OUTPUT);
+        digitalWrite(EVE_CS, HIGH);
+        pinMode(EVE_PDN, OUTPUT);
+        digitalWrite(EVE_PDN, LOW);
+
+        Serial.println("    Init SPI");
+    	EVE_init_spi();
+
+        Serial.println("    EVE_init");
+        if (EVE_init() != 0)
+        {
+            Serial.println("    PWM");
+            EVE_memWrite8(REG_PWM_DUTY, 0x30);	// setup backlight, range is from 0 = off to 0x80 = max 
+            EVE_cmd_apilevel(2);  // BT817
+
+            // send pre-recorded touch calibration values, depending on the display the code is compiled for 
+            // EVE_RVT70
+            Serial.println("    Touch calibration");
+            EVE_memWrite32(REG_TOUCH_TRANSFORM_A, 0x000074df);
+            EVE_memWrite32(REG_TOUCH_TRANSFORM_B, 0x000000e6);
+            EVE_memWrite32(REG_TOUCH_TRANSFORM_C, 0xfffd5474);
+            EVE_memWrite32(REG_TOUCH_TRANSFORM_D, 0x000001af);
+            EVE_memWrite32(REG_TOUCH_TRANSFORM_E, 0x00007e79);
+            EVE_memWrite32(REG_TOUCH_TRANSFORM_F, 0xffe9a63c);
+
+            Serial.println("    First busy loop");
+            while (EVE_busy());    
+
+            // background
+            Serial.println("    Display list");
+            EVE_start_cmd_burst();
+            EVE_cmd_dl_burst(CMD_DLSTART); // Start the display list 
+            EVE_cmd_dl_burst(TAG(0)); // do not use the following objects for touch-detection 
+
+            EVE_cmd_dl_burst(DL_CLEAR_RGB | WHITE);
+            EVE_cmd_dl_burst(DL_CLEAR | CLR_COL | CLR_STN | CLR_TAG);
+
+            // Black text
+            EVE_cmd_dl_burst(DL_COLOR_RGB | BLACK);
+            EVE_cmd_text_burst(EVE_HSIZE/2, 15, 29, EVE_OPT_CENTERX, "EVEopenHAB");
+
+            EVE_cmd_dl_burst(DL_DISPLAY); // put in the display list to mark its end
+            EVE_cmd_dl_burst(CMD_SWAP); // tell EVE to use the new display list
+
+            EVE_end_cmd_burst();
+            
+            Serial.println("    Second busy loop");
+            while (EVE_busy());    
+            Serial.println("    All done");
+        }
+        else
+        {
+            Serial.println("    EVE_init() failed");
+        }
     }
 
     bool requestSent = false;
