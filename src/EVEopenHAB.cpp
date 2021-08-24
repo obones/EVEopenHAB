@@ -87,7 +87,7 @@ namespace EVEopenHAB
             if (request->responseHTTPcode() == 200)
             {
                 Serial.println(F("Deserializing JSON"));
-                StaticJsonDocument<96> doc;
+                StaticJsonDocument<2048> doc;
 
                 DeserializationError error = deserializeJson(doc, responseText.c_str(), responseText.length());
 
@@ -96,6 +96,17 @@ namespace EVEopenHAB
                     Serial.print(F("deserializeJson() failed: "));
                     Serial.println(error.f_str());
                     return;
+                }
+
+                auto widgets = doc["homepage"]["widgets"].as<JsonArray>();
+                int widgetIndex = 0;
+                for (JsonArray::iterator it = widgets.begin(); it != widgets.end(); ++it)//(int widgetIndex = 0; widgetIndex < widgets.size(); widgetIndex++)
+                {
+                    Serial.print("Widget ");
+                    Serial.print(widgetIndex);
+                    Serial.print(": ");
+                    Serial.println(it->as<JsonObject>()["label"].as<const char*>());
+                    widgetIndex++;
                 }
             }
             else
