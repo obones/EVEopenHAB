@@ -105,6 +105,9 @@ namespace EVEopenHAB
         }
     }    
 
+    // must be a global variable because it needs to survive the end of the MainLoop call below
+    asyncHTTPrequest request;
+
     void MainLoop()
     {
         EVEopenHAB::Wifi::MainLoop();
@@ -115,7 +118,6 @@ namespace EVEopenHAB
             requestSent = true;
 
             Serial.println(F("Requesting the sitemap"));
-            asyncHTTPrequest request;
             request.setDebug(true);
             request.onReadyStateChange(requestReadyStateChange);
             request.open("GET", SitemapURL);
