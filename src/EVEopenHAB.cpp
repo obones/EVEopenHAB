@@ -141,6 +141,10 @@ namespace EVEopenHAB
     {
         if (readyState == 4)
         {
+            // Stop the spinner
+            EVE_cmd_dl(CMD_STOP);
+            while (EVE_busy()); 
+
             Serial.println(F("Received a response, processing..."));
             Serial.print(F("  HTTP response code: "));
             Serial.println(request->responseHTTPcode());
@@ -193,6 +197,17 @@ namespace EVEopenHAB
         if ((WiFi.status() == WL_CONNECTED) && !requestSent)
         {
             requestSent = true;
+
+            // Display a spinner until we have received the sitemap
+            EVE_start_cmd_burst();
+            EVE_cmd_dl_burst(CMD_DLSTART); 
+            EVE_cmd_dl_burst(DL_CLEAR_RGB | WHITE);
+            EVE_cmd_dl_burst(DL_CLEAR | CLR_COL | CLR_STN | CLR_TAG);
+            EVE_cmd_dl_burst(DL_COLOR_RGB | BLACK);
+            EVE_cmd_text_burst(EVE_HSIZE / 2, EVE_VSIZE / 4, 29, EVE_OPT_CENTERX, "Waiting for sitemap...");
+            EVE_cmd_spinner_burst(EVE_HSIZE / 2, EVE_VSIZE / 2, 0, 0);
+            EVE_end_cmd_burst();
+            while (EVE_busy());    
 
             Serial.println(F("Requesting the sitemap"));
             request.setDebug(true);
