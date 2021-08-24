@@ -28,7 +28,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 // If you get an error complaining about this file being missing, please create it using the template file located in the include folder
 #include "UserSettings.h"
 
-#define BASE_REST_URL BASE_URL "rest/"
-const char SitemapURL[] = BASE_REST_URL "/sitemap/" SITEMAP_NAME;
+#define BASE_REST_URL BASE_URL "/rest"
+const char SitemapURL[] = BASE_REST_URL "/sitemaps/" SITEMAP_NAME;
 
 #endif
