@@ -1,0 +1,83 @@
+{
+  "name": "uicomponents_eve",
+  "label": "For EVEopenHAB",
+  "link": "http://server:8080/rest/sitemaps/uicomponents_eve",
+  "homepage": {
+    "id": "uicomponents_eve",
+    "title": "For EVEopenHAB",
+    "link": "http://server:8080/rest/sitemaps/uicomponents_eve/uicomponents_eve",
+    "leaf": false,
+    "timeout": false,
+    "widgets": [
+      {
+        "widgetId": "00",
+        "type": "Text",
+        "visibility": true,
+        "label": "Temperature",
+        "icon": "temperature",
+        "mappings": [],
+        "item": {
+          "link": "http://server:8080/rest/items/PrologueTH_Temperature",
+          "state": "25.8",
+          "type": "Number",
+          "name": "PrologueTH_Temperature",
+          "label": "Temperature",
+          "category": "temperature",
+          "tags": [
+            "Point"
+          ],
+          "groupNames": []
+        },
+        "widgets": []
+      },
+      {
+        "widgetId": "01",
+        "type": "Slider",
+        "visibility": true,
+        "label": "PositionVoletBureau",
+        "icon": "rollershutter",
+        "mappings": [],
+        "switchSupport": false,
+        "sendFrequency": 0,
+        "item": {
+          "link": "http://server:8080/rest/items/VoletBureau_Position",
+          "state": "67",
+          "type": "Rollershutter",
+          "name": "VoletBureau_Position",
+          "label": "PositionVoletBureau",
+          "category": "Blinds",
+          "tags": [
+            "Point"
+          ],
+          "groupNames": [
+            "VoletBureau"
+          ]
+        },
+        "widgets": []
+      },
+      {
+        "widgetId": "02",
+        "type": "Switch",
+        "visibility": true,
+        "label": "PositionVoletSdB",
+        "icon": "rollershutter",
+        "mappings": [],
+        "item": {
+          "link": "http://server:8080/rest/items/VoletSdB_Position",
+          "state": "59",
+          "type": "Rollershutter",
+          "name": "VoletSdB_Position",
+          "label": "PositionVoletSdB",
+          "category": "Blinds",
+          "tags": [
+            "Point"
+          ],
+          "groupNames": [
+            "VoletSdB"
+          ]
+        },
+        "widgets": []
+      }
+    ]
+  }
+}
