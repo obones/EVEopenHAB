@@ -25,9 +25,12 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #ifndef EVEOPENHAB_H
 #define EVEOPENHAB_H
 
+#include "EOHomepage.h"
+
 namespace EVEopenHAB 
 {
     extern struct timeval timeAtBoot; // used to calculate update
+    extern Homepage* homepage;
 
     void Setup();    
     void MainLoop();

@@ -46,6 +46,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 namespace EVEopenHAB
 {
     struct timeval timeAtBoot;
+    Homepage* homepage = nullptr;
     const unsigned long BAUD = 115200;            // 57600;      // Baudrate for serial communication.
 
     void Setup()
@@ -169,7 +170,7 @@ namespace EVEopenHAB
                     return;
                 }
 
-                auto widgets = doc["homepage"]["widgets"].as<JsonArray>();
+                /*auto widgets = doc["homepage"]["widgets"].as<JsonArray>();
                 int widgetIndex = 0;
                 for (JsonArray::iterator it = widgets.begin(); it != widgets.end(); ++it)//(int widgetIndex = 0; widgetIndex < widgets.size(); widgetIndex++)
                 {
@@ -178,9 +179,19 @@ namespace EVEopenHAB
                     Serial.print(": ");
                     Serial.println(it->as<JsonObject>()["label"].as<const char*>());
                     widgetIndex++;
-                }
+                }*/
 
-                Homepage homepage = Homepage(doc["homepage"].as<JsonObject>());
+                if (homepage)
+                    delete homepage;
+                    
+                homepage = new Homepage(doc["homepage"].as<JsonObject>());
+                for (int widgetIndex = 0; widgetIndex < homepage->Widgets().size(); widgetIndex++)
+                {
+                    Serial.print("Widget ");
+                    Serial.print(widgetIndex);
+                    Serial.print(": ");
+                    Serial.println(homepage->Widgets()[widgetIndex].Label().c_str());
+                }
             }
             else
             {
