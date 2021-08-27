@@ -33,6 +33,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include "EOConfig.h"
 #include "EOWifi.h"
 #include "EOSettings.h"
+#include "EOHomepage.h"
 
 #include <EVE.h>
 #include <EVE_commands.h>
@@ -178,6 +179,8 @@ namespace EVEopenHAB
                     Serial.println(it->as<JsonObject>()["label"].as<const char*>());
                     widgetIndex++;
                 }
+
+                Homepage homepage = Homepage(doc["homepage"].as<JsonObject>());
             }
             else
             {
