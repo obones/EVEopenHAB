@@ -33,7 +33,7 @@ namespace EVEopenHAB
             type = WidgetType::Unknown;
         label = sourceObject["label"].as<String>();
         icon = sourceObject["icon"].as<String>();
-        visibility = sourceObject["label"].as<bool>();
+        visibility = sourceObject["visibility"].as<bool>();
     }
 
     WidgetType Widget::Type()
