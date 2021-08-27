@@ -30,10 +30,20 @@ namespace EVEopenHAB
     Homepage::Homepage(JsonObject sourceObject)
     {
         id = sourceObject["id"].as<String>();
+
+        auto jsonWidgets = sourceObject["widgets"].as<JsonArray>();
+        widgets.reserve(jsonWidgets.size());
+        for (JsonArray::iterator it = jsonWidgets.begin(); it != jsonWidgets.end(); ++it)//(int widgetIndex = 0; widgetIndex < widgets.size(); widgetIndex++)
+            widgets.push_back(Widget(it->as<JsonObject>()));
     }
 
     String Homepage::Id()
     {
         return id;
+    }
+
+    std::vector<Widget> Homepage::Widgets()
+    {
+        return widgets;
     }
 }

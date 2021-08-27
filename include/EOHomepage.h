@@ -27,6 +27,8 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 #include <ArduinoJson.h>
 #include <WString.h>
+#include <vector>
+#include "EOWidget.h"
 
 namespace EVEopenHAB 
 {
@@ -34,9 +36,11 @@ namespace EVEopenHAB
     {
         private:
             String id;
+            std::vector<Widget> widgets;
         public:
             Homepage(JsonObject sourceObject);
             String Id();
+            std::vector<Widget> Widgets();
     };
 }
 
