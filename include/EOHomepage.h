@@ -43,6 +43,7 @@ namespace EVEopenHAB
             virtual ~Homepage();
 
             Rect ClientRect();
+            void LayoutChildren();
 
             String Id();
             std::vector<Widget> Widgets();

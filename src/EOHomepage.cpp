@@ -50,6 +50,29 @@ namespace EVEopenHAB
         return {.Left = 0, .Top = TopMargin, .Width = EVE_HSIZE, .Height = EVE_VSIZE - TopMargin};
     }
 
+    void Homepage::LayoutChildren()
+    {
+        const int16_t margin = 20;
+        
+        int16_t widgetWidth = EVE_HSIZE / 2 - 2 * margin;
+        int16_t widgetHeight = 80;
+        int16_t widgetTop = margin;
+
+        for (int widgetIndex = 0; widgetIndex < widgets.size(); widgetIndex++)
+        {
+            int16_t widgetLeft = (widgetIndex % 2 == 0) ? margin : EVE_HSIZE / 2 + margin;
+
+            auto currentWidget = widgets[widgetIndex];
+
+            currentWidget.SetLeft(widgetLeft);
+            currentWidget.SetTop(widgetTop);
+            currentWidget.SetWidth(widgetWidth);
+            currentWidget.SetHeight(widgetHeight);
+
+            widgetTop += widgetHeight + margin;
+        }
+    }
+
     String Homepage::Id()
     {
         return id;
