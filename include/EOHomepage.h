@@ -29,16 +29,21 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include <WString.h>
 #include <vector>
 #include "EOWidget.h"
+#include "EOBase.h"
 
 namespace EVEopenHAB 
 {
-    class Homepage 
+    class Homepage: public Base 
     {
         private:
             String id;
             std::vector<Widget> widgets;
         public:
             Homepage(JsonObject sourceObject);
+            virtual ~Homepage();
+
+            Rect ClientRect();
+
             String Id();
             std::vector<Widget> Widgets();
     };

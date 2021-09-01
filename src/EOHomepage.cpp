@@ -23,11 +23,14 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 */
 
+#include <EVE.h>
 #include "EOHomepage.h"
 
 namespace EVEopenHAB 
 {
-    Homepage::Homepage(JsonObject sourceObject)
+    const int16_t TopMargin = 40;
+
+    Homepage::Homepage(JsonObject sourceObject): Base(nullptr)
     {
         id = sourceObject["id"].as<String>();
 
@@ -35,6 +38,16 @@ namespace EVEopenHAB
         widgets.reserve(jsonWidgets.size());
         for (JsonArray::iterator it = jsonWidgets.begin(); it != jsonWidgets.end(); ++it)//(int widgetIndex = 0; widgetIndex < widgets.size(); widgetIndex++)
             widgets.push_back(Widget(it->as<JsonObject>()));
+    }
+
+    Homepage::~Homepage()
+    {
+        // nothing, this is just here to keep the compiler happy
+    }
+
+    Rect Homepage::ClientRect()
+    {
+        return {.Left = 0, .Top = TopMargin, .Width = EVE_HSIZE, .Height = EVE_VSIZE - TopMargin};
     }
 
     String Homepage::Id()
