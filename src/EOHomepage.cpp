@@ -37,7 +37,7 @@ namespace EVEopenHAB
         auto jsonWidgets = sourceObject["widgets"].as<JsonArray>();
         widgets.reserve(jsonWidgets.size());
         for (JsonArray::iterator it = jsonWidgets.begin(); it != jsonWidgets.end(); ++it)//(int widgetIndex = 0; widgetIndex < widgets.size(); widgetIndex++)
-            widgets.push_back(Widget(it->as<JsonObject>()));
+            widgets.push_back(Widget(this, it->as<JsonObject>()));
     }
 
     Homepage::~Homepage()

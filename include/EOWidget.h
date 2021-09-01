@@ -28,6 +28,8 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include <ArduinoJson.h>
 #include <WString.h>
 #include "EnumString.h"
+#include "EOBase.h"
+#include "EOMoveable.h"
 #include "EOItem.h"
 
 namespace EVEopenHAB 
@@ -50,7 +52,7 @@ namespace EVEopenHAB
         Unknown
     };
     
-    class Widget 
+    class Widget: public Moveable 
     {
         private:
             WidgetType type;
@@ -60,7 +62,7 @@ namespace EVEopenHAB
             Item linkedItem;
 
         public:
-            Widget(JsonObject sourceObject);
+            Widget(Base* parent, JsonObject sourceObject);
 
             WidgetType Type();
             String Label();
