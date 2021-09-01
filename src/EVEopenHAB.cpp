@@ -34,14 +34,12 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include "EOWifi.h"
 #include "EOSettings.h"
 #include "EOHomepage.h"
+#include "EOConstants.h"
 
 #include <EVE.h>
 #include <EVE_commands.h>
 #include <EVE_target.h>
 #include <EVE_config.h>
-
-#define BLACK	0x000000UL
-#define WHITE	0xffffffUL
 
 namespace EVEopenHAB
 {
