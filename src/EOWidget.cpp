@@ -27,7 +27,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 namespace EVEopenHAB 
 {
-    Widget::Widget(Base* parent, JsonObject sourceObject): Moveable(parent), linkedItem(sourceObject["item"].as<JsonObject>())
+    Widget::Widget(Base* parent, JsonObject sourceObject): Moveable(parent), linkedItem(this, sourceObject["item"].as<JsonObject>())
     {
         if (!EnumString<WidgetType>::To(type, sourceObject["type"].as<const char*>()))
             type = WidgetType::Unknown;
