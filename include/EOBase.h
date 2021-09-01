@@ -48,6 +48,7 @@ namespace EVEopenHAB
             Base(Base* parent);
 
             virtual Rect ClientRect() = 0;
+            virtual void Render() = 0;
             uint32_t ClientToScreen(int16_t x, int16_t y);
             Base* Parent();
     };

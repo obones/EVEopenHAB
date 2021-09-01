@@ -44,6 +44,7 @@ namespace EVEopenHAB
 
             Rect ClientRect();
             void LayoutChildren();
+            void Render();
 
             String Id();
             std::vector<Widget> Widgets();

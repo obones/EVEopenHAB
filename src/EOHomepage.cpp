@@ -25,6 +25,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 #include <EVE.h>
 #include "EOHomepage.h"
+#include "EOConstants.h"
 
 namespace EVEopenHAB 
 {
@@ -71,6 +72,33 @@ namespace EVEopenHAB
 
             widgetTop += widgetHeight + margin;
         }
+    }
+
+    void Homepage::Render()
+    {
+        EVE_start_cmd_burst();
+        EVE_cmd_dl_burst(CMD_DLSTART); // Start the display list 
+        EVE_cmd_dl_burst(TAG(0)); // do not use the following objects for touch-detection 
+
+        EVE_cmd_dl_burst(DL_CLEAR_RGB | WHITE);
+        EVE_cmd_dl_burst(DL_CLEAR | CLR_COL | CLR_STN | CLR_TAG);
+
+        // Black text
+        EVE_cmd_dl_burst(DL_COLOR_RGB | BLACK);
+        EVE_cmd_text_burst(EVE_HSIZE/2, 15, 29, EVE_OPT_CENTERX, "EVEopenHAB");
+
+        for (int widgetIndex = 0; widgetIndex < widgets.size(); widgetIndex++)
+        {
+            widgets[widgetIndex].Render();
+        }
+
+        EVE_cmd_dl_burst(DL_DISPLAY); // put in the display list to mark its end
+        EVE_cmd_dl_burst(CMD_SWAP); // tell EVE to use the new display list
+        
+        EVE_end_cmd_burst();
+        
+        Serial.println("    Second busy loop");
+        while (EVE_busy());    
     }
 
     String Homepage::Id()

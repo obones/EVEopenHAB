@@ -64,6 +64,8 @@ namespace EVEopenHAB
         public:
             Widget(Base* parent, JsonObject sourceObject);
 
+            void Render();
+
             WidgetType Type();
             String Label();
             String Icon();

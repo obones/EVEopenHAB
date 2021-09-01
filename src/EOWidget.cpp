@@ -36,6 +36,11 @@ namespace EVEopenHAB
         visibility = sourceObject["visibility"].as<bool>();
     }
 
+    void Widget::Render()
+    {
+
+    }
+
     WidgetType Widget::Type()
     {
         return type;
