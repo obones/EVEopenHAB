@@ -27,7 +27,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 namespace EVEopenHAB 
 {
-    Item::Item(Base* parent, JsonObject sourceObject): Moveable(parent)
+    Item::Item(JsonObject sourceObject)
     {
         if (!EnumString<ItemType>::To(type, sourceObject["type"].as<const char*>()))
             type = ItemType::Unsupported;
