@@ -32,8 +32,8 @@ namespace EVEopenHAB
     typedef struct 
     {
         int16_t Left;
-        int16_t Width;
         int16_t Top;
+        int16_t Width;
         int16_t Height;
 
         int16_t Bottom() { return Top + Height; };
