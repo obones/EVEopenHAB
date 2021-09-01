@@ -40,6 +40,12 @@ namespace EVEopenHAB
         int16_t Right() { return Left + Width; };
     } Rect;
 
+    typedef struct
+    {
+        int16_t X;
+        int16_t Y;
+    } Point;
+
     class Base
     {
         private:
@@ -49,7 +55,8 @@ namespace EVEopenHAB
 
             virtual Rect ClientRect() = 0;
             virtual void Render() = 0;
-            uint32_t ClientToScreen(int16_t x, int16_t y);
+            uint32_t ClientToScreen2F(int16_t x, int16_t y);
+            Point ClientToScreen(int16_t x, int16_t y);
             Base* Parent();
     };
 }

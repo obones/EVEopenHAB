@@ -33,7 +33,13 @@ namespace EVEopenHAB
         this->parent = parent;
     }
 
-    uint32_t Base::ClientToScreen(int16_t x, int16_t y)
+    uint32_t Base::ClientToScreen2F(int16_t x, int16_t y)
+    {
+        Point point = ClientToScreen(x, y);
+        return VERTEX2F(point.X, point.Y);
+    }
+
+    Point Base::ClientToScreen(int16_t x, int16_t y)
     {
         if (parent != nullptr)
         {
@@ -41,7 +47,7 @@ namespace EVEopenHAB
             return parent->ClientToScreen(x + clientRect.Left, y + clientRect.Top);
         }
         else
-            return VERTEX2F(x, y);
+            return { .X = x, .Y = y};
     }
 
     Base* Base::Parent()
