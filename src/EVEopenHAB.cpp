@@ -190,6 +190,9 @@ namespace EVEopenHAB
                     Serial.print(": ");
                     Serial.println(homepage->Widgets()[widgetIndex].Label().c_str());
                 }
+
+                homepage->LayoutChildren();
+                homepage->Render();
             }
             else
             {
