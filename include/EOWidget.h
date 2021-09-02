@@ -63,6 +63,7 @@ namespace EVEopenHAB
 
         public:
             Widget(Base* parent, JsonObject sourceObject);
+            virtual ~Widget();
 
             void Render();
 
