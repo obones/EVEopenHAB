@@ -81,7 +81,8 @@ namespace EVEopenHAB
     {
         EVE_start_cmd_burst();
         EVE_cmd_dl_burst(CMD_DLSTART); // Start the display list 
-        EVE_cmd_dl_burst(TAG(0)); // do not use the following objects for touch-detection 
+        EVE_cmd_dl_burst(TAG(0)); // By default, do not use the following objects for touch-detection 
+    	EVE_cmd_dl_burst(VERTEX_FORMAT(0)); // reduce precision for VERTEX2F to 1 pixel instead of 1/16 pixel default 
 
         EVE_cmd_dl_burst(DL_CLEAR_RGB | WHITE);
         EVE_cmd_dl_burst(DL_CLEAR | CLR_COL | CLR_STN | CLR_TAG);
