@@ -41,13 +41,15 @@ namespace EVEopenHAB
 
     Point Base::ClientToScreen(int16_t x, int16_t y)
     {
-        if (parent != nullptr)
-        {
-            Rect clientRect = ClientRect();
-            return parent->ClientToScreen(x + clientRect.Left, y + clientRect.Top);
-        }
+        Rect clientRect = ClientRect();
+
+        x += clientRect.Left;
+        y += clientRect.Top;
+
+        if (parent != nullptr) 
+            return parent->ClientToScreen(x, y);
         else
-            return { .X = x, .Y = y};
+            return { .X = x, .Y = y };
     }
 
     Base* Base::Parent()
