@@ -23,7 +23,10 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 */
 
+#include <EVE.h>
+
 #include "EOWidget.h"
+#include "EOConstants.h"
 
 namespace EVEopenHAB 
 {
@@ -43,7 +46,19 @@ namespace EVEopenHAB
 
     void Widget::Render()
     {
+        Point textPoint = ClientToScreen(0, Height() / 2);
+        Point topLeft = ClientToScreen(0, 0);
+        Point bottomRight = ClientToScreen(Width(), Height());
 
+        EVE_cmd_dl_burst(COLOR_RGB(0xFF, 0,0));
+        EVE_cmd_dl_burst(DL_BEGIN | EVE_RECTS);
+    	EVE_cmd_dl_burst(LINE_WIDTH(1 * 16)); // size is in 1/16 pixel for this command, regardless of format
+        EVE_cmd_dl_burst(VERTEX2F(topLeft.X, topLeft.Y));
+        EVE_cmd_dl_burst(VERTEX2F(bottomRight.X, bottomRight.Y));
+        EVE_cmd_dl_burst(DL_END);
+
+        EVE_cmd_dl_burst(DL_COLOR_RGB | BLACK);
+        EVE_cmd_text_burst(textPoint.X, textPoint.Y, 28, EVE_OPT_CENTERY, label.c_str());
     }
 
     WidgetType Widget::Type()
