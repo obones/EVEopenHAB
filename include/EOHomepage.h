@@ -37,7 +37,7 @@ namespace EVEopenHAB
     {
         private:
             String id;
-            std::vector<Widget> widgets;
+            std::vector<Widget*> widgets;
         public:
             Homepage(JsonObject sourceObject);
             virtual ~Homepage();
@@ -47,7 +47,7 @@ namespace EVEopenHAB
             void Render();
 
             String Id();
-            std::vector<Widget> Widgets();
+            std::vector<Widget*> Widgets();
     };
 }
 

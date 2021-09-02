@@ -38,12 +38,14 @@ namespace EVEopenHAB
         auto jsonWidgets = sourceObject["widgets"].as<JsonArray>();
         widgets.reserve(jsonWidgets.size());
         for (JsonArray::iterator it = jsonWidgets.begin(); it != jsonWidgets.end(); ++it)//(int widgetIndex = 0; widgetIndex < widgets.size(); widgetIndex++)
-            widgets.push_back(Widget(this, it->as<JsonObject>()));
+            widgets.push_back(new Widget(this, it->as<JsonObject>()));
     }
 
     Homepage::~Homepage()
     {
-        // nothing, this is just here to keep the compiler happy
+        for (int widgetIndex = 0; widgetIndex < widgets.size(); widgetIndex++)
+            delete widgets[widgetIndex];
+        widgets.clear();
     }
 
     Rect Homepage::ClientRect()
@@ -65,10 +67,10 @@ namespace EVEopenHAB
 
             auto currentWidget = widgets[widgetIndex];
 
-            currentWidget.SetLeft(widgetLeft);
-            currentWidget.SetTop(widgetTop);
-            currentWidget.SetWidth(widgetWidth);
-            currentWidget.SetHeight(widgetHeight);
+            currentWidget->SetLeft(widgetLeft);
+            currentWidget->SetTop(widgetTop);
+            currentWidget->SetWidth(widgetWidth);
+            currentWidget->SetHeight(widgetHeight);
 
             widgetTop += widgetHeight + margin;
         }
@@ -89,7 +91,7 @@ namespace EVEopenHAB
 
         for (int widgetIndex = 0; widgetIndex < widgets.size(); widgetIndex++)
         {
-            widgets[widgetIndex].Render();
+            widgets[widgetIndex]->Render();
         }
 
         EVE_cmd_dl_burst(DL_DISPLAY); // put in the display list to mark its end
@@ -106,7 +108,7 @@ namespace EVEopenHAB
         return id;
     }
 
-    std::vector<Widget> Homepage::Widgets()
+    std::vector<Widget*> Homepage::Widgets()
     {
         return widgets;
     }
