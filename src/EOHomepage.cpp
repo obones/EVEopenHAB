@@ -72,7 +72,8 @@ namespace EVEopenHAB
             currentWidget->SetWidth(widgetWidth);
             currentWidget->SetHeight(widgetHeight);
 
-            widgetTop += widgetHeight + margin;
+            if (widgetIndex % 2 == 1)
+                widgetTop += widgetHeight + margin;
         }
     }
 
