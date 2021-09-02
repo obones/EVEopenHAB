@@ -188,7 +188,7 @@ namespace EVEopenHAB
                     Serial.print("Widget ");
                     Serial.print(widgetIndex);
                     Serial.print(": ");
-                    Serial.println(homepage->Widgets()[widgetIndex].Label().c_str());
+                    Serial.println(homepage->Widgets()[widgetIndex]->Label().c_str());
                 }
 
                 homepage->LayoutChildren();
