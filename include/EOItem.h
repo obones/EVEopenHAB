@@ -62,21 +62,21 @@ namespace EVEopenHAB
 
 Begin_Enum_String(EVEopenHAB::ItemType)
 {
-    Enum_String(EVEopenHAB::ItemType::None);
-    /*Enum_String(EVEopenHAB::ItemType::Color);
-    Enum_String(EVEopenHAB::ItemType::Contact);
-    Enum_String(EVEopenHAB::ItemType::DateTime);
-    Enum_String(EVEopenHAB::ItemType::Dimmer);
-    Enum_String(EVEopenHAB::ItemType::Group);
-    Enum_String(EVEopenHAB::ItemType::Image);
-    Enum_String(EVEopenHAB::ItemType::Location);*/
-    Enum_String(EVEopenHAB::ItemType::Number);
-    /*Enum_String(EVEopenHAB::ItemType::NumberWithDimension);
-    Enum_String(EVEopenHAB::ItemType::Player);*/
-    Enum_String(EVEopenHAB::ItemType::Rollershutter);
-    /*Enum_String(EVEopenHAB::ItemType::StringItem);
-    Enum_String(EVEopenHAB::ItemType::Switch);*/
-    Enum_String(EVEopenHAB::ItemType::Unsupported);
+    RegisterEnumerator(EVEopenHAB::ItemType::None, "None");
+    /*RegisterEnumerator(EVEopenHAB::ItemType::Color, "Color");
+    RegisterEnumerator(EVEopenHAB::ItemType::Contact, "Contact");
+    RegisterEnumerator(EVEopenHAB::ItemType::DateTime, "DateTime");
+    RegisterEnumerator(EVEopenHAB::ItemType::Dimmer, "Dimmer");
+    RegisterEnumerator(EVEopenHAB::ItemType::Group, "Group");
+    RegisterEnumerator(EVEopenHAB::ItemType::Image, "Image");
+    RegisterEnumerator(EVEopenHAB::ItemType::Location, "Location");*/
+    RegisterEnumerator(EVEopenHAB::ItemType::Number, "Number");
+    /*RegisterEnumerator(EVEopenHAB::ItemType::NumberWithDimension, "NumberWithDimension");
+    RegisterEnumerator(EVEopenHAB::ItemType::Player, "Player");*/
+    RegisterEnumerator(EVEopenHAB::ItemType::Rollershutter, "Rollershutter");
+    /*RegisterEnumerator(EVEopenHAB::ItemType::StringItem, "StringItem");
+    RegisterEnumerator(EVEopenHAB::ItemType::Switch, "Switch");*/
+    RegisterEnumerator(EVEopenHAB::ItemType::Unsupported, "Unsupported");
 }
 End_Enum_String;    
 

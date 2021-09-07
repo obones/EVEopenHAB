@@ -77,21 +77,21 @@ namespace EVEopenHAB
 
 Begin_Enum_String(EVEopenHAB::WidgetType)
 {
-    /*Enum_String(EVEopenHAB::WidgetType::Chart);
-    Enum_String(EVEopenHAB::WidgetType::Colorpicker);
-    Enum_String(EVEopenHAB::WidgetType::Default);
-    Enum_String(EVEopenHAB::WidgetType::Frame);
-    Enum_String(EVEopenHAB::WidgetType::Group);
-    Enum_String(EVEopenHAB::WidgetType::Image);
-    Enum_String(EVEopenHAB::WidgetType::Mapview);
-    Enum_String(EVEopenHAB::WidgetType::Selection);
-    Enum_String(EVEopenHAB::WidgetType::Setpoint);*/
-    Enum_String(EVEopenHAB::WidgetType::Slider);
-    Enum_String(EVEopenHAB::WidgetType::Switch);
-    Enum_String(EVEopenHAB::WidgetType::Text);
-    /*Enum_String(EVEopenHAB::WidgetType::Video);
-    Enum_String(EVEopenHAB::WidgetType::Webview);*/
-    Enum_String(EVEopenHAB::WidgetType::Unknown);
+    /*RegisterEnumerator(EVEopenHAB::WidgetType::Chart, "Chart");
+    RegisterEnumerator(EVEopenHAB::WidgetType::Colorpicker, "Colorpicker);
+    RegisterEnumerator(EVEopenHAB::WidgetType::Default, "Default");
+    RegisterEnumerator(EVEopenHAB::WidgetType::Frame, "Frame");
+    RegisterEnumerator(EVEopenHAB::WidgetType::Group, "Group");
+    RegisterEnumerator(EVEopenHAB::WidgetType::Image, "Image");
+    RegisterEnumerator(EVEopenHAB::WidgetType::Mapview, "Mapview");
+    RegisterEnumerator(EVEopenHAB::WidgetType::Selection, "Selection");
+    RegisterEnumerator(EVEopenHAB::WidgetType::Setpoint, "Setpoint");*/
+    RegisterEnumerator(EVEopenHAB::WidgetType::Slider, "Slider");
+    RegisterEnumerator(EVEopenHAB::WidgetType::Switch, "Switch");
+    RegisterEnumerator(EVEopenHAB::WidgetType::Text, "Text");
+    /*RegisterEnumerator(EVEopenHAB::WidgetType::Video, "Video");
+    RegisterEnumerator(EVEopenHAB::WidgetType::Webview, "Webview");*/
+    RegisterEnumerator(EVEopenHAB::WidgetType::Unknown, "Unknown");
 }
 End_Enum_String;    
 
