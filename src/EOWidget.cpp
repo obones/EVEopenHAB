@@ -166,12 +166,17 @@ namespace EVEopenHAB
         }
     }
 
-    void Widget::sendCommand(uint8_t tag, void* customData)
+    void Widget::sendCommand(uint8_t tag, uint16_t trackedValue, void* customData)
     {
         Serial.print("Widget ");
         Serial.print(label);
         Serial.print(" received tag ");
-        Serial.println(tag);
+        Serial.print(tag);
+        Serial.print(" - tracked value = ");
+        Serial.print(trackedValue);
+        Serial.print(" - customData = ");
+        Serial.printf("%p", customData);
+        Serial.println("");
     }
 
     WidgetType Widget::Type()

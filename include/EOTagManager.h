@@ -35,7 +35,7 @@ namespace EVEopenHAB
     class TagManager
     {
         public:
-            typedef  void (Widget::*TagCallBack)(uint8_t tag, void* customData);
+            typedef  void (Widget::*TagCallBack)(uint8_t tag, uint16_t trackedValue, void* customData);
         private:
             typedef struct
             {
@@ -49,7 +49,7 @@ namespace EVEopenHAB
             TagManager() {}
         public:
             uint8_t GetNextTag(Widget& object, TagCallBack callback, void* customData);
-            void Invoke(uint8_t tag);
+            void Invoke(uint8_t tag, uint16_t trackedValue);
 
             static TagManager Instance();
     };

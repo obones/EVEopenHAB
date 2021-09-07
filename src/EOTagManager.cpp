@@ -38,12 +38,12 @@ namespace EVEopenHAB
         return records.size();
     }
 
-    void TagManager::Invoke(uint8_t tag)
+    void TagManager::Invoke(uint8_t tag, uint16_t trackedValue)
     {
         if (tag > 0)
         {
             auto record = records[tag - 1];
-            CALL_MEMBER_FN(record.object, record.callback)(tag, record.customData);
+            CALL_MEMBER_FN(record.object, record.callback)(tag, trackedValue, record.customData);
         }
     }
 
