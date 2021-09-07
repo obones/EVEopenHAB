@@ -29,6 +29,11 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include "EOWidget.h"
 #include "EOConstants.h"
 #include "EOItem.h"
+#include "EOTagManager.h"
+
+#define OHAB_CMD_UP 0
+#define OHAB_CMD_DOWN 1
+#define OHAB_CMD_STOP 2
 
 namespace EVEopenHAB 
 {
@@ -121,23 +126,28 @@ namespace EVEopenHAB
                         EVE_cmd_fgcolor_burst(0xDDDDDD);
                         Point buttonPoint = ClientToScreen(Width() - buttonSize - buttonRightMargin, (Height() - buttonSize) / 2);
 
+                        EVE_cmd_dl_burst(TAG(TagManager::Instance().GetNextTag(*this, &EVEopenHAB::Widget::sendCommand, reinterpret_cast<void*>(OHAB_CMD_UP))));
                         EVE_cmd_dl_burst(CMD_LOADIDENTITY);
                         EVE_cmd_translate_burst(0, 3 * 65536 + 5);
                         EVE_cmd_dl_burst(CMD_SETMATRIX);
                         EVE_cmd_button_burst(buttonPoint.X, buttonPoint.Y, buttonSize, buttonSize, fontIndex, EVE_OPT_FLAT, "^");
 
                         buttonPoint.X -= buttonSize + buttonRightMargin;
+                        EVE_cmd_dl_burst(TAG(TagManager::Instance().GetNextTag(*this, &EVEopenHAB::Widget::sendCommand, reinterpret_cast<void*>(OHAB_CMD_STOP))));
                         EVE_cmd_dl_burst(CMD_LOADIDENTITY);
                         EVE_cmd_dl_burst(CMD_SETMATRIX);
                         EVE_cmd_button_burst(buttonPoint.X, buttonPoint.Y, buttonSize, buttonSize, fontIndex - 1, EVE_OPT_FLAT, "X");
 
                         buttonPoint.X -= buttonSize + buttonRightMargin;
+                        EVE_cmd_dl_burst(TAG(TagManager::Instance().GetNextTag(*this, &EVEopenHAB::Widget::sendCommand, reinterpret_cast<void*>(OHAB_CMD_DOWN))));
                         EVE_cmd_dl_burst(CMD_LOADIDENTITY);
                         EVE_cmd_rotatearound_burst(4, 10, 32768, 65536);
                         EVE_cmd_dl_burst(CMD_SETMATRIX);
                         EVE_cmd_button_burst(buttonPoint.X, buttonPoint.Y, buttonSize, buttonSize, fontIndex, EVE_OPT_FLAT, "^");
                         EVE_cmd_dl_burst(CMD_LOADIDENTITY);
                         EVE_cmd_dl_burst(CMD_SETMATRIX);
+
+                        EVE_cmd_dl_burst(TAG(0));
 
                         break;
                     }
@@ -154,6 +164,14 @@ namespace EVEopenHAB
             case WidgetType::Unknown:
                 break;
         }
+    }
+
+    void Widget::sendCommand(uint8_t tag, void* customData)
+    {
+        Serial.print("Widget ");
+        Serial.print(label);
+        Serial.print(" received tag ");
+        Serial.println(tag);
     }
 
     WidgetType Widget::Type()

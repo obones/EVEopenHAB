@@ -62,6 +62,7 @@ namespace EVEopenHAB
             bool visibility;
             Item linkedItem;
 
+            void sendCommand(uint8_t tag, void* customData);
         public:
             Widget(Base* parent, JsonObject sourceObject);
             virtual ~Widget();
