@@ -57,6 +57,7 @@ namespace EVEopenHAB
         private:
             WidgetType type;
             String label;
+            const char* state = NULL;
             String icon;
             bool visibility;
             Item linkedItem;

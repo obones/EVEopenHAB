@@ -38,6 +38,19 @@ namespace EVEopenHAB
         label = sourceObject["label"].as<String>();
         icon = sourceObject["icon"].as<String>();
         visibility = sourceObject["visibility"].as<bool>();
+
+        auto openingBracketIndex = label.indexOf('[');
+        if (openingBracketIndex >= 0)
+        {
+            auto closingBracketIndex = label.indexOf(']', openingBracketIndex);
+            if (closingBracketIndex > openingBracketIndex)
+            {
+                // Only store a pointer and place 0 character at appropriate places to save RAM
+                state = label.c_str() + openingBracketIndex + 1;
+                label[openingBracketIndex] = 0;
+                label[closingBracketIndex] = 0;
+            }
+        }
     }
 
     Widget::~Widget()
@@ -70,6 +83,13 @@ namespace EVEopenHAB
         switch (type)
         {
             case WidgetType::Text:
+                if (state)
+                {
+                    const int16_t textRightMargin = 5 + rectanglePenWidth;
+
+                    textPoint = ClientToScreen(Width() - textRightMargin, Height() / 2);
+                    EVE_cmd_text_burst(textPoint.X, textPoint.Y, fontIndex, EVE_OPT_CENTERY | EVE_OPT_RIGHTX, state);
+                }
                 break;
             
             case WidgetType::Slider:
