@@ -53,10 +53,12 @@ namespace EVEopenHAB
     {
         private:
             ItemType type;
+            String link;
         public:
             Item(JsonObject sourceObject);
         
             ItemType Type();
+            String Link();
     };
 }
 

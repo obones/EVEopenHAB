@@ -31,10 +31,16 @@ namespace EVEopenHAB
     {
         if (!EnumString<ItemType>::To(type, sourceObject["type"].as<const char*>()))
             type = ItemType::Unsupported;
+        link = sourceObject["link"].as<String>();
     }
 
     ItemType Item::Type()
     {
         return type;
+    }
+
+    String Item::Link()
+    {
+        return link;
     }
 }
