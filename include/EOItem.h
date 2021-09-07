@@ -28,6 +28,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include <ArduinoJson.h>
 #include <WString.h>
 #include "EnumString.h"
+#include "EOParsedState.h"
 
 namespace EVEopenHAB 
 {
@@ -54,11 +55,13 @@ namespace EVEopenHAB
         private:
             ItemType type;
             String link;
+            ParsedState state;
         public:
             Item(JsonObject sourceObject);
         
             ItemType Type();
             String Link();
+            ParsedState State();
     };
 }
 

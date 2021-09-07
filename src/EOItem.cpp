@@ -27,7 +27,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 namespace EVEopenHAB 
 {
-    Item::Item(JsonObject sourceObject)
+    Item::Item(JsonObject sourceObject): state(sourceObject["state"].as<const char*>())
     {
         if (!EnumString<ItemType>::To(type, sourceObject["type"].as<const char*>()))
             type = ItemType::Unsupported;
@@ -42,5 +42,10 @@ namespace EVEopenHAB
     String Item::Link()
     {
         return link;
+    }
+
+    ParsedState Item::State()
+    {
+        return state;
     }
 }
