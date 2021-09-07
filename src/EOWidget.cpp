@@ -23,6 +23,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 */
 
+#include <cmath>
 #include <EVE.h>
 
 #include "EOWidget.h"
@@ -94,6 +95,9 @@ namespace EVEopenHAB
             
             case WidgetType::Slider:
             {
+                float state = linkedItem.State().AsNumber();
+                int16_t intState = (std::isnan(state)) ? 0 : round(state);
+
                 const int16_t sliderWidth = Width() / 3;
                 const int16_t sliderHeight = 10;
                 const int16_t sliderRightMargin = 5 + sliderHeight; // the height is used to draw the button
@@ -102,7 +106,7 @@ namespace EVEopenHAB
                 EVE_cmd_dl_burst(COLOR_RGB(255, 170, 0));
                 EVE_cmd_fgcolor_burst(0x999999);
                 EVE_cmd_bgcolor_burst(0xDDDDDD);
-                EVE_cmd_slider_burst(sliderPoint.X, sliderPoint.Y, sliderWidth, sliderHeight, EVE_OPT_FLAT, 0, 100);
+                EVE_cmd_slider_burst(sliderPoint.X, sliderPoint.Y, sliderWidth, sliderHeight, EVE_OPT_FLAT, intState, 100);
 
                 break;
             }
