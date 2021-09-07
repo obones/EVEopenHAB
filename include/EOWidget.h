@@ -63,6 +63,7 @@ namespace EVEopenHAB
             Item linkedItem;
 
             void sendCommand(uint8_t tag, uint16_t trackedValue, void* customData);
+            void sendSliderValue(uint8_t tag, uint16_t trackedValue, void* customData);
         public:
             Widget(Base* parent, JsonObject sourceObject);
             virtual ~Widget();

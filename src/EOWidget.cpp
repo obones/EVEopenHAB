@@ -108,6 +108,12 @@ namespace EVEopenHAB
                 const int16_t sliderRightMargin = 5 + sliderHeight; // the height is used to draw the button
 
                 Point sliderPoint = ClientToScreen(Width() - sliderWidth - sliderRightMargin, (Height() - sliderHeight) / 2);
+
+                uint8_t tag = TagManager::Instance().GetNextTag(*this, &EVEopenHAB::Widget::sendSliderValue, nullptr);
+
+                EVE_cmd_track(sliderPoint.X, sliderPoint.Y, sliderWidth, sliderHeight, tag);
+
+                EVE_cmd_dl_burst(TAG(tag));
                 EVE_cmd_dl_burst(COLOR_RGB(255, 170, 0));
                 EVE_cmd_fgcolor_burst(0x999999);
                 EVE_cmd_bgcolor_burst(0xDDDDDD);
@@ -171,6 +177,19 @@ namespace EVEopenHAB
         Serial.print("Widget ");
         Serial.print(label);
         Serial.print(" received tag ");
+        Serial.print(tag);
+        Serial.print(" - tracked value = ");
+        Serial.print(trackedValue);
+        Serial.print(" - customData = ");
+        Serial.printf("%p", customData);
+        Serial.println("");
+    }
+
+    void Widget::sendSliderValue(uint8_t tag, uint16_t trackedValue, void* customData)
+    {
+        Serial.print("Widget ");
+        Serial.print(label);
+        Serial.print(" received tracked tag ");
         Serial.print(tag);
         Serial.print(" - tracked value = ");
         Serial.print(trackedValue);
