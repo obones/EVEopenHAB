@@ -27,6 +27,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 #include "EOWidget.h"
 #include "EOConstants.h"
+#include "EOItem.h"
 
 namespace EVEopenHAB 
 {
@@ -50,15 +51,85 @@ namespace EVEopenHAB
         Point topLeft = ClientToScreen(0, 0);
         Point bottomRight = ClientToScreen(Width(), Height());
 
-        EVE_cmd_dl_burst(COLOR_RGB(0xFF, 0,0));
+        const int16_t rectanglePenWidth = 2;
+        const int16_t fontIndex = 28;
+
+        EVE_cmd_dl_burst(COLOR_RGB(0xEE, 0xEE,0xEE));
         EVE_cmd_dl_burst(DL_BEGIN | EVE_RECTS);
-    	EVE_cmd_dl_burst(LINE_WIDTH(1 * 16)); // size is in 1/16 pixel for this command, regardless of format
+    	EVE_cmd_dl_burst(LINE_WIDTH(5 * 16)); // size is in 1/16 pixel for this command, regardless of format
         EVE_cmd_dl_burst(VERTEX2F(topLeft.X, topLeft.Y));
         EVE_cmd_dl_burst(VERTEX2F(bottomRight.X, bottomRight.Y));
+        EVE_cmd_dl_burst(DL_COLOR_RGB | WHITE);
+        EVE_cmd_dl_burst(VERTEX2F(topLeft.X + rectanglePenWidth, topLeft.Y + rectanglePenWidth));
+        EVE_cmd_dl_burst(VERTEX2F(bottomRight.X - rectanglePenWidth, bottomRight.Y - rectanglePenWidth));
         EVE_cmd_dl_burst(DL_END);
 
         EVE_cmd_dl_burst(DL_COLOR_RGB | BLACK);
-        EVE_cmd_text_burst(textPoint.X, textPoint.Y, 28, EVE_OPT_CENTERY, label.c_str());
+        EVE_cmd_text_burst(textPoint.X, textPoint.Y, fontIndex, EVE_OPT_CENTERY, label.c_str());
+
+        switch (type)
+        {
+            case WidgetType::Text:
+                break;
+            
+            case WidgetType::Slider:
+            {
+                const int16_t sliderWidth = Width() / 3;
+                const int16_t sliderHeight = 10;
+                const int16_t sliderRightMargin = 5 + sliderHeight; // the height is used to draw the button
+
+                Point sliderPoint = ClientToScreen(Width() - sliderWidth - sliderRightMargin, (Height() - sliderHeight) / 2);
+                EVE_cmd_dl_burst(COLOR_RGB(255, 170, 0));
+                EVE_cmd_fgcolor_burst(0x999999);
+                EVE_cmd_bgcolor_burst(0xDDDDDD);
+                EVE_cmd_slider_burst(sliderPoint.X, sliderPoint.Y, sliderWidth, sliderHeight, EVE_OPT_FLAT, 0, 100);
+
+                break;
+            }
+            case WidgetType::Switch:
+                switch (linkedItem.Type())
+                {
+                    case ItemType::Rollershutter:
+                    {
+                        const int16_t buttonSize = Height() / 2;
+                        const int16_t buttonRightMargin = 5;
+
+                        EVE_cmd_fgcolor_burst(0xDDDDDD);
+                        Point buttonPoint = ClientToScreen(Width() - buttonSize - buttonRightMargin, (Height() - buttonSize) / 2);
+
+                        EVE_cmd_dl_burst(CMD_LOADIDENTITY);
+                        EVE_cmd_translate_burst(0, 3 * 65536 + 5);
+                        EVE_cmd_dl_burst(CMD_SETMATRIX);
+                        EVE_cmd_button_burst(buttonPoint.X, buttonPoint.Y, buttonSize, buttonSize, fontIndex, EVE_OPT_FLAT, "^");
+
+                        buttonPoint.X -= buttonSize + buttonRightMargin;
+                        EVE_cmd_dl_burst(CMD_LOADIDENTITY);
+                        EVE_cmd_dl_burst(CMD_SETMATRIX);
+                        EVE_cmd_button_burst(buttonPoint.X, buttonPoint.Y, buttonSize, buttonSize, fontIndex - 1, EVE_OPT_FLAT, "X");
+
+                        buttonPoint.X -= buttonSize + buttonRightMargin;
+                        EVE_cmd_dl_burst(CMD_LOADIDENTITY);
+                        EVE_cmd_rotatearound_burst(4, 10, 32768, 65536);
+                        EVE_cmd_dl_burst(CMD_SETMATRIX);
+                        EVE_cmd_button_burst(buttonPoint.X, buttonPoint.Y, buttonSize, buttonSize, fontIndex, EVE_OPT_FLAT, "^");
+                        EVE_cmd_dl_burst(CMD_LOADIDENTITY);
+                        EVE_cmd_dl_burst(CMD_SETMATRIX);
+
+                        break;
+                    }
+                    case ItemType::Number:
+                        break;
+
+                    case ItemType::None:
+                    case ItemType::Unsupported:
+                        break;
+                }
+
+                break;
+            
+            case WidgetType::Unknown:
+                break;
+        }
     }
 
     WidgetType Widget::Type()
