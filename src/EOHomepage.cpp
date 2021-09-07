@@ -93,7 +93,9 @@ namespace EVEopenHAB
 
         for (int widgetIndex = 0; widgetIndex < widgets.size(); widgetIndex++)
         {
+            EVE_cmd_dl_burst(SAVE_CONTEXT());
             widgets[widgetIndex]->Render();
+            EVE_cmd_dl_burst(RESTORE_CONTEXT());
         }
 
         EVE_cmd_dl_burst(DL_DISPLAY); // put in the display list to mark its end
