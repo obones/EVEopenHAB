@@ -50,6 +50,8 @@ namespace EVEopenHAB
     {
         private:
             Base* parent;
+        protected:
+            virtual void SetDirty();
         public:
             Base(Base* parent);
 

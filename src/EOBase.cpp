@@ -56,4 +56,11 @@ namespace EVEopenHAB
     {
         return parent;
     }
+
+    void Base::SetDirty()
+    {
+        if (parent != nullptr)
+            parent->SetDirty();
+    }
+
 }
