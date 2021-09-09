@@ -79,6 +79,8 @@ namespace EVEopenHAB
 
     void Homepage::Render()
     {
+        isDirty = false;
+
         EVE_start_cmd_burst();
         EVE_cmd_dl_burst(CMD_DLSTART); // Start the display list 
         EVE_cmd_dl_burst(TAG(0)); // By default, do not use the following objects for touch-detection 
@@ -116,4 +118,15 @@ namespace EVEopenHAB
     {
         return widgets;
     }
+
+    void Homepage::SetDirty()
+    {
+        isDirty = true;
+    }
+
+    bool Homepage::IsDirty()
+    {
+        return isDirty;
+    }
+
 }

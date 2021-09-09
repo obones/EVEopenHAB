@@ -38,6 +38,9 @@ namespace EVEopenHAB
         private:
             String id;
             std::vector<Widget*> widgets;
+            bool isDirty = true;
+        protected:
+            void SetDirty();
         public:
             Homepage(JsonObject sourceObject);
             virtual ~Homepage();
@@ -48,6 +51,7 @@ namespace EVEopenHAB
 
             String Id();
             std::vector<Widget*> Widgets();
+            bool IsDirty();
     };
 }
 
