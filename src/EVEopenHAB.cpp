@@ -141,10 +141,6 @@ namespace EVEopenHAB
     {
         if (readyState == 4)
         {
-            // Stop the spinner
-            EVE_cmd_dl(CMD_STOP);
-            while (EVE_busy()); 
-
             Serial.println(F("Received a response, processing..."));
             Serial.print(F("  HTTP response code: "));
             Serial.println(request->responseHTTPcode());
@@ -190,9 +186,6 @@ namespace EVEopenHAB
                     Serial.print(": ");
                     Serial.println(homepage->Widgets()[widgetIndex]->Label().c_str());
                 }
-
-                homepage->LayoutChildren();
-                homepage->Render();
             }
             else
             {
@@ -229,6 +222,12 @@ namespace EVEopenHAB
             request.onReadyStateChange(requestReadyStateChange);
             request.open("GET", SitemapURL);
             request.send();
+        }
+
+        if (homepage && homepage->IsDirty())
+        {
+            homepage->LayoutChildren();
+            homepage->Render();
         }
     }
 }
