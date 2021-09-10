@@ -27,6 +27,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 #include <Arduino.h>
 #include <EVE.h>
+#include <functional>
 
 #include "EOWidget.h"
 
@@ -35,11 +36,11 @@ namespace EVEopenHAB
     class TagManager
     {
         public:
-            typedef  void (Widget::*TagCallBack)(uint8_t tag, uint16_t trackedValue, void* customData);
+            typedef std::function<void(Widget*, uint8_t tag, uint16_t trackedValue, void* customData)> TagCallBack;
         private:
             typedef struct
             {
-                Widget& object;
+                Widget* object;
                 TagCallBack callback;
                 void* customData;
             } tagRecord;
@@ -48,7 +49,7 @@ namespace EVEopenHAB
 
             TagManager() {}
         public:
-            uint8_t GetNextTag(Widget& object, TagCallBack callback, void* customData);
+            uint8_t GetNextTag(Widget* object, TagCallBack callback, void* customData);
             void Invoke(uint8_t tag, uint16_t trackedValue);
 
             static TagManager* Instance();

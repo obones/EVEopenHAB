@@ -25,11 +25,9 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 #include "EOTagManager.h"
 
-#define CALL_MEMBER_FN(object, ptrToMember)  ((object).*(ptrToMember))
-
 namespace EVEopenHAB 
 {
-    uint8_t TagManager::GetNextTag(Widget& object, TagCallBack callback, void* customData)
+    uint8_t TagManager::GetNextTag(Widget* object, TagCallBack callback, void* customData)
     {
         if (records.size() == 254)
             return 0;
@@ -43,7 +41,7 @@ namespace EVEopenHAB
         if (tag > 0)
         {
             auto record = records[tag - 1];
-            CALL_MEMBER_FN(record.object, record.callback)(tag, trackedValue, record.customData);
+            record.callback(record.object, tag, trackedValue, record.customData);
         }
     }
 
