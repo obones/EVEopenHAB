@@ -35,6 +35,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include "EOSettings.h"
 #include "EOHomepage.h"
 #include "EOConstants.h"
+#include "EOTagManager.h"
 
 #include <EVE.h>
 #include <EVE_commands.h>
@@ -103,6 +104,9 @@ namespace EVEopenHAB
             EVE_memWrite32(REG_TOUCH_TRANSFORM_D, 0x000001af);
             EVE_memWrite32(REG_TOUCH_TRANSFORM_E, 0x00007e79);
             EVE_memWrite32(REG_TOUCH_TRANSFORM_F, 0xffe9a63c);
+
+            EVE_memWrite8(REG_CTOUCH_EXTENDED, 0); // extended mode
+            EVE_memWrite8(REG_TOUCH_MODE, 0b11); // touch engine activated
 
             Serial.println("    First busy loop");
             while (EVE_busy());    
@@ -224,6 +228,29 @@ namespace EVEopenHAB
             request.send();
         }
 
+        // Touch engine handling
+        {
+        	if (!EVE_busy()) // is EVE still processing the last display list? 
+            {
+                uint8_t tag = 0;
+                uint16_t trackedValue = 0;
+
+                uint32_t trackerInfo = EVE_memRead32(REG_TRACKER); // read the first tracker
+                if (trackerInfo)    
+                {
+                    tag = trackerInfo & 0xFF;
+                    trackedValue = trackerInfo >> 16;
+                }
+                else
+                {
+                    tag = EVE_memRead8(REG_TOUCH_TAG); // read the value for the first touch point 
+                }                
+
+                TagManager::Instance()->Invoke(tag, trackedValue);
+            }
+        }
+
+        // homepage display
         if (homepage && homepage->IsDirty())
         {
             homepage->LayoutChildren();
