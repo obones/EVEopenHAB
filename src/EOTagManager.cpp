@@ -47,9 +47,9 @@ namespace EVEopenHAB
         }
     }
 
-    TagManager TagManager::Instance()
+    TagManager* TagManager::Instance()
     {
         static TagManager instance;
-        return instance;
+        return &instance;
     }
 }
