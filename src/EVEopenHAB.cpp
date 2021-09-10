@@ -29,6 +29,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include <asyncHTTPrequest.h>
 #include <WString.h>
 #include <ArduinoJson.h>
+#include <LITTLEFS.h>
 #include "EVEopenHAB.h"
 #include "EOConfig.h"
 #include "EOWifi.h"
@@ -69,16 +70,6 @@ namespace EVEopenHAB
         {
             EVE_memWrite8(REG_PWM_DUTY, 0x30);	// setup backlight, range is from 0 = off to 0x80 = max 
             EVE_cmd_apilevel(2);  // BT817
-
-            // send pre-recorded touch calibration values, depending on the display the code is compiled for 
-            // EVE_RVT70
-            Serial.println("    Touch calibration");
-            EVE_memWrite32(REG_TOUCH_TRANSFORM_A, 0x000074df);
-            EVE_memWrite32(REG_TOUCH_TRANSFORM_B, 0x000000e6);
-            EVE_memWrite32(REG_TOUCH_TRANSFORM_C, 0xfffd5474);
-            EVE_memWrite32(REG_TOUCH_TRANSFORM_D, 0x000001af);
-            EVE_memWrite32(REG_TOUCH_TRANSFORM_E, 0x00007e79);
-            EVE_memWrite32(REG_TOUCH_TRANSFORM_F, 0xffe9a63c);
 
             EVE_memWrite8(REG_CTOUCH_EXTENDED, 0); // extended mode
             EVE_memWrite8(REG_TOUCH_MODE, 0b11); // touch engine activated
@@ -130,6 +121,80 @@ namespace EVEopenHAB
 
         //EVEopenHAB::Portal::Start();
 
+        // look for saved touch calibration values, if it does not exist, call the calibration widget and create the file
+        Serial.println("Looking for touch calibration values");
+        {
+            const char TouchFileName[] = "/touch.bin";
+            if (LITTLEFS.exists(TouchFileName))
+            {
+                Serial.println("Calibration file found, using directly");
+                File file = LITTLEFS.open(TouchFileName, "r");
+                uint32_t regValue;
+
+                file.read(reinterpret_cast<uint8_t*>(&regValue), sizeof(regValue));
+                EVE_memWrite32(REG_TOUCH_TRANSFORM_A, regValue);
+
+                file.read(reinterpret_cast<uint8_t*>(&regValue), sizeof(regValue));
+                EVE_memWrite32(REG_TOUCH_TRANSFORM_B, regValue);
+
+                file.read(reinterpret_cast<uint8_t*>(&regValue), sizeof(regValue));
+                EVE_memWrite32(REG_TOUCH_TRANSFORM_C, regValue);
+
+                file.read(reinterpret_cast<uint8_t*>(&regValue), sizeof(regValue));
+                EVE_memWrite32(REG_TOUCH_TRANSFORM_D, regValue);
+
+                file.read(reinterpret_cast<uint8_t*>(&regValue), sizeof(regValue));
+                EVE_memWrite32(REG_TOUCH_TRANSFORM_E, regValue);
+
+                file.read(reinterpret_cast<uint8_t*>(&regValue), sizeof(regValue));
+                EVE_memWrite32(REG_TOUCH_TRANSFORM_F, regValue);
+                file.close();
+            }
+            else
+            {
+                Serial.println("Calibration file not found, forcing calibration");
+                EVE_memWrite8(REG_CTOUCH_EXTENDED, 1); // force compatibility mode for calibration
+
+                EVE_cmd_dl(CMD_DLSTART); // Start the display list 
+
+                EVE_cmd_dl(DL_CLEAR_RGB | WHITE);
+                EVE_cmd_dl(DL_CLEAR | CLR_COL | CLR_STN | CLR_TAG);
+
+                EVE_cmd_dl(DL_COLOR_RGB | BLACK);
+                EVE_cmd_text(EVE_HSIZE / 2, EVE_VSIZE / 2, 31, EVE_OPT_CENTER, "EVEopenHAB");
+                EVE_cmd_text(EVE_HSIZE / 2, EVE_VSIZE / 2 + 30, 29, EVE_OPT_CENTERX, "Calibrating touch screen, please tap on the dots");
+                EVE_cmd_calibrate();
+                EVE_cmd_dl(DL_DISPLAY); 
+                EVE_cmd_dl(CMD_SWAP);
+                while (EVE_busy());
+
+                File file = LITTLEFS.open(TouchFileName, "w");
+                uint32_t regValue;
+
+                regValue = EVE_memRead32(REG_TOUCH_TRANSFORM_A);
+                file.write(reinterpret_cast<uint8_t*>(&regValue), sizeof(regValue));
+
+                regValue = EVE_memRead32(REG_TOUCH_TRANSFORM_B);
+                file.write(reinterpret_cast<uint8_t*>(&regValue), sizeof(regValue));
+                
+                regValue = EVE_memRead32(REG_TOUCH_TRANSFORM_C);
+                file.write(reinterpret_cast<uint8_t*>(&regValue), sizeof(regValue));
+                
+                regValue = EVE_memRead32(REG_TOUCH_TRANSFORM_D);
+                file.write(reinterpret_cast<uint8_t*>(&regValue), sizeof(regValue));
+                
+                regValue = EVE_memRead32(REG_TOUCH_TRANSFORM_E);
+                file.write(reinterpret_cast<uint8_t*>(&regValue), sizeof(regValue));
+                
+                regValue = EVE_memRead32(REG_TOUCH_TRANSFORM_F);
+                file.write(reinterpret_cast<uint8_t*>(&regValue), sizeof(regValue));
+                
+                file.close();
+
+                EVE_memWrite8(REG_CTOUCH_EXTENDED, 0); // Restore extended mode
+            }
+
+        }
     }
 
     bool requestSent = false;
