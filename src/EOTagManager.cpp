@@ -38,7 +38,7 @@ namespace EVEopenHAB
 
     void TagManager::Invoke(uint8_t tag, uint16_t trackedValue)
     {
-        if (tag > 0)
+        if (tag > 0 && tag <= records.size())
         {
             auto record = records[tag - 1];
             record.callback(record.object, tag, trackedValue, record.customData);
