@@ -113,32 +113,46 @@ namespace EVEopenHAB
 
         void MainLoop()
         {
-            // Touch engine handling
-        	if (!EVE_busy()) // is EVE still processing the last display list? 
+            uint32_t current_millis = millis();
+            static uint32_t previous_millis = 0;
+
+            if((current_millis - previous_millis) > 4) // execute the code every 5 milli-seconds
             {
-                uint8_t tag = 0;
-                uint16_t trackedValue = 0;
+                previous_millis = current_millis;
 
-                uint32_t trackerInfo = EVE_memRead32(REG_TRACKER); // read the first tracker
-                if (trackerInfo)    
+                if (!EVE_busy()) // is EVE still processing the last display list? 
                 {
-                    tag = trackerInfo & 0xFF;
-                    trackedValue = trackerInfo >> 16;
+                    static uint8_t previousTag = 0;
+                    static uint16_t previousTrackedValue = 0;
+
+                    uint8_t tag = 0;
+                    uint16_t trackedValue = 0;
+
+                    uint32_t trackerInfo = EVE_memRead32(REG_TRACKER); // read the first tracker
+                    if (trackerInfo)    
+                    {
+                        tag = trackerInfo & 0xFF;
+                        trackedValue = trackerInfo >> 16;
+                    }
+                    else
+                    {
+                        tag = EVE_memRead8(REG_TOUCH_TAG); // read the value for the first touch point 
+                    }                
+
+                    /*if (tag)
+                    {
+                        Serial.print("Found touch, tag = ");
+                        Serial.print(tag);
+                        Serial.print(" - trackedValue = ");
+                        Serial.println(trackedValue);
+                    }*/
+
+                    if (previousTag != tag)
+                        TagManager::Instance()->Invoke(previousTag, previousTrackedValue);
+
+                    previousTag = tag;
+                    previousTrackedValue = trackedValue;
                 }
-                else
-                {
-                    tag = EVE_memRead8(REG_TOUCH_TAG); // read the value for the first touch point 
-                }                
-
-                /*if (tag)
-                {
-                    Serial.print("Found touch, tag = ");
-                    Serial.print(tag);
-                    Serial.print(" - trackedValue = ");
-                    Serial.println(trackedValue);
-                }*/
-
-                TagManager::Instance()->Invoke(tag, trackedValue);
             }
         }
     }
