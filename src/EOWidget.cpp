@@ -118,7 +118,7 @@ void EVE_cmd_track_burst(int16_t x0, int16_t y0, int16_t w0, int16_t h0, int16_t
 
                 Point sliderPoint = ClientToScreen(Width() - sliderWidth - sliderRightMargin, (Height() - sliderHeight) / 2);
 
-                Point trackPoint = { .X = sliderPoint.X, .Y = sliderPoint.Y + 2 * sliderHeight }; // ???? fix the tracking offset
+                Point trackPoint = { .X = sliderPoint.X, .Y = static_cast<int16_t>(sliderPoint.Y + 2 * sliderHeight) }; // ???? fix the tracking offset
                 const int16_t trackHeight = sliderHeight; 
                 const int16_t trackWidth = sliderWidth; 
 
