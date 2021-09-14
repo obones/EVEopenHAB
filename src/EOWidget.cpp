@@ -64,6 +64,14 @@ namespace EVEopenHAB
 
     }
 
+void EVE_cmd_track_burst(int16_t x0, int16_t y0, int16_t w0, int16_t h0, int16_t tag)
+{
+	spi_transmit_burst(CMD_TRACK);
+	spi_transmit_burst((uint32_t) x0 + ((uint32_t) y0 << 16));
+	spi_transmit_burst((uint32_t) w0 + ((uint32_t) h0 << 16));
+	spi_transmit_burst(tag);
+}
+
     void Widget::Render()
     {
         Point textPoint = ClientToScreen(0, Height() / 2);
