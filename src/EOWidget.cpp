@@ -81,6 +81,7 @@ namespace EVEopenHAB
         EVE_cmd_dl_burst(DL_COLOR_RGB | WHITE);
         EVE_cmd_dl_burst(VERTEX2F(topLeft.X + rectanglePenWidth, topLeft.Y + rectanglePenWidth));
         EVE_cmd_dl_burst(VERTEX2F(bottomRight.X - rectanglePenWidth, bottomRight.Y - rectanglePenWidth));
+    	EVE_cmd_dl_burst(LINE_WIDTH(1 * 16)); // size is in 1/16 pixel for this command, regardless of format
         EVE_cmd_dl_burst(DL_END);
 
         EVE_cmd_dl_burst(DL_COLOR_RGB | BLACK);
