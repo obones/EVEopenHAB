@@ -25,6 +25,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 #include <cmath>
 #include <EVE.h>
+#include <asyncHTTPrequest.h>
 
 #include "EOWidget.h"
 #include "EOConstants.h"
@@ -216,6 +217,16 @@ void EVE_cmd_track_burst(int16_t x0, int16_t y0, int16_t w0, int16_t h0, int16_t
         }
     }
 
+    asyncHTTPrequest postRequest;
+    void Widget::postItemValue(const char* value)
+    {
+        postRequest.setDebug(true);
+        //postRequest.abort();
+        postRequest.open("POST", linkedItem.Link().c_str());
+        postRequest.setReqHeader("Content-Type","text/plain");
+        postRequest.send(value);
+    }
+
     void Widget::sendCommand(uint8_t tag, uint16_t trackedValue, void* customData)
     {
         Serial.print("Widget ");
@@ -227,6 +238,10 @@ void EVE_cmd_track_burst(int16_t x0, int16_t y0, int16_t w0, int16_t h0, int16_t
         Serial.print(" - customData = ");
         Serial.printf("%p", customData);
         Serial.println("");
+
+        const char* commands[] = { "UP", "DOWN", "STOP" };
+
+        postItemValue(commands[reinterpret_cast<int>(customData)]);
     }
 
     void Widget::sendSliderValue(uint8_t tag, uint16_t trackedValue, void* customData)
@@ -240,6 +255,13 @@ void EVE_cmd_track_burst(int16_t x0, int16_t y0, int16_t w0, int16_t h0, int16_t
         Serial.print(" - customData = ");
         Serial.printf("%p", customData);
         Serial.println("");
+
+        String positionStr = String(((int32_t)trackedValue * 100) / 65536);
+
+        linkedItem.SetState(positionStr.c_str());
+        SetDirty();
+
+        postItemValue(positionStr.c_str());
     }
 
     WidgetType Widget::Type()
