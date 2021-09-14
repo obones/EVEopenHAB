@@ -304,6 +304,14 @@ namespace EVEopenHAB
                     tag = EVE_memRead8(REG_TOUCH_TAG); // read the value for the first touch point 
                 }                
 
+                /*if (tag)
+                {
+                    Serial.print("Found touch, tag = ");
+                    Serial.print(tag);
+                    Serial.print(" - trackedValue = ");
+                    Serial.println(trackedValue);
+                }*/
+
                 TagManager::Instance()->Invoke(tag, trackedValue);
             }
         }
