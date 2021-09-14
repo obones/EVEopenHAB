@@ -48,4 +48,10 @@ namespace EVEopenHAB
     {
         return state;
     }
+
+    void Item::SetState(const char* strValue)
+    {
+        state = ParsedState(strValue);
+    }
+
 }

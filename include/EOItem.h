@@ -62,6 +62,8 @@ namespace EVEopenHAB
             ItemType Type();
             String Link();
             ParsedState State();
+
+            void SetState(const char* strValue);
     };
 }
 
