@@ -1,5 +1,5 @@
 /*
-@file    Wifi.cpp
+@file    EOWifi.cpp
 @brief   Contains Wifi definitions
 @date    2021-08-18
 @author  Olivier Sannier
