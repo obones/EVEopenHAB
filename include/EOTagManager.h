@@ -49,6 +49,7 @@ namespace EVEopenHAB
 
             TagManager() {}
         public:
+            void Reset();
             uint8_t GetNextTag(Widget* object, TagCallBack callback, void* customData);
             void Invoke(uint8_t tag, uint16_t trackedValue);
 

@@ -27,6 +27,11 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 namespace EVEopenHAB 
 {
+    void TagManager::Reset()
+    {
+        records.clear();
+    }
+
     uint8_t TagManager::GetNextTag(Widget* object, TagCallBack callback, void* customData)
     {
         if (records.size() == 254)
