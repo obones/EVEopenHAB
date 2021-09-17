@@ -224,7 +224,7 @@ void EVE_cmd_track_burst(int16_t x0, int16_t y0, int16_t w0, int16_t h0, int16_t
         Serial.printf("%p", customData);
         Serial.println("");
 
-        String positionStr = String(((int32_t)trackedValue * 100) / 65536);
+        String positionStr = String(((int32_t)trackedValue * 100) / 65535);
 
         linkedItem.SetState(positionStr.c_str());
         SetDirty();
