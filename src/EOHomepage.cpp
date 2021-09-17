@@ -26,6 +26,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include <EVE.h>
 #include "EOHomepage.h"
 #include "EOConstants.h"
+#include "EOTagManager.h"
 
 namespace EVEopenHAB 
 {
@@ -79,6 +80,8 @@ namespace EVEopenHAB
 
     void Homepage::Render()
     {
+        TagManager::Instance()->Reset();
+
         isDirty = false;
 
         EVE_start_cmd_burst();
