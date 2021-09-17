@@ -118,51 +118,19 @@ void EVE_cmd_track_burst(int16_t x0, int16_t y0, int16_t w0, int16_t h0, int16_t
                 const int16_t sliderRightMargin = 5 + sliderHeight; // the height is used to draw the button
 
                 Point sliderPoint = ClientToScreen(Width() - sliderWidth - sliderRightMargin, (Height() - sliderHeight) / 2);
-
-                Point trackPoint = { .X = sliderPoint.X, .Y = static_cast<int16_t>(sliderPoint.Y + 2 * sliderHeight) }; // ???? fix the tracking offset
+                Point trackPoint = sliderPoint;
                 const int16_t trackHeight = sliderHeight; 
                 const int16_t trackWidth = sliderWidth; 
 
-                /*EVE_cmd_dl_burst(DL_BEGIN | EVE_RECTS);
-                EVE_cmd_dl_burst(COLOR_RGB(255, 0, 0));
-                EVE_cmd_dl_burst(VERTEX2F(trackPoint.X, trackPoint.Y));
-                EVE_cmd_dl_burst(VERTEX2F(trackPoint.X + trackWidth, trackPoint.Y + trackHeight));
-                EVE_cmd_dl_burst(DL_END);
-
-                EVE_cmd_dl_burst(DL_BEGIN | EVE_RECTS);
-                EVE_cmd_dl_burst(COLOR_RGB(0, 0, 255));
-                EVE_cmd_dl_burst(VERTEX2F(sliderPoint.X, sliderPoint.Y));
-                EVE_cmd_dl_burst(VERTEX2F(sliderPoint.X + sliderWidth, sliderPoint.Y + sliderHeight));
-                EVE_cmd_dl_burst(DL_END);
-
-                EVE_cmd_dl_burst(DL_BEGIN | EVE_RECTS);
-                EVE_cmd_dl_burst(COLOR_RGB(0, 180, 0));
-                EVE_cmd_dl_burst(VERTEX2F(sliderPoint.X, sliderPoint.Y - 2 * sliderHeight));
-                EVE_cmd_dl_burst(VERTEX2F(sliderPoint.X + sliderWidth, sliderPoint.Y - sliderHeight));
-                EVE_cmd_dl_burst(DL_END);*/
-
                 uint8_t tag = TagManager::Instance()->GetNextTag(this, &EVEopenHAB::Widget::sendSliderValue, nullptr);
 
-//                EVE_cmd_track_burst(trackPoint.X, trackPoint.Y, trackWidth, trackHeight, tag);
-                //EVE_cmd_track_burst(trackPoint.X, 0, trackWidth, trackHeight, tag);
+                EVE_cmd_track_burst(trackPoint.X, trackPoint.Y, trackWidth, trackHeight, tag);
 
                 EVE_cmd_dl_burst(COLOR_RGB(255, 170, 0));
                 EVE_cmd_fgcolor_burst(0x999999);
                 EVE_cmd_bgcolor_burst(0xDDDDDD);
-//                EVE_cmd_dl_burst(TAG(tag));
-                EVE_cmd_slider_burst(sliderPoint.X, sliderPoint.Y, sliderWidth, sliderHeight, EVE_OPT_FLAT, intState, 100);
-                //EVE_cmd_button_burst(sliderPoint.X, sliderPoint.Y, sliderWidth, Height() / 2, fontIndex, EVE_OPT_FLAT, "T");
-                
-                // ???? There appears to be a tracking offset to the top, so we display a transparent rectangle and track it instead of the slider
                 EVE_cmd_dl_burst(TAG(tag));
-                EVE_cmd_track_burst(trackPoint.X, trackPoint.Y, sliderWidth, sliderHeight, tag);
-                EVE_cmd_dl_burst(DL_BEGIN | EVE_RECTS);
-                EVE_cmd_dl_burst(COLOR_A(0));
-                //EVE_cmd_dl_burst(COLOR_RGB(0,255,200));
-                EVE_cmd_dl_burst(VERTEX2F(trackPoint.X, trackPoint.Y));
-                EVE_cmd_dl_burst(VERTEX2F(trackPoint.X + trackWidth, trackPoint.Y + trackHeight));
-                EVE_cmd_dl_burst(DL_END);
-                EVE_cmd_dl_burst(TAG(0));
+                EVE_cmd_slider_burst(sliderPoint.X, sliderPoint.Y, sliderWidth, sliderHeight, EVE_OPT_FLAT, intState, 100);
 
                 break;
             }
