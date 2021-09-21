@@ -111,19 +111,29 @@ namespace EVEopenHAB
 
             request->setDebug(false);
 
+            IconManager* manager = static_cast<IconManager*>(optParm);
+                
             if (request->responseHTTPcode() == 200)
             {
-                IconManager* manager = static_cast<IconManager*>(optParm);
-                
                 IconManager::iconRecord& record = manager->records[manager->indexBeingRetrieved];
 
                 record.bufferLength = request->available();
                 record.buffer = new byte[record.bufferLength];
-                request->responseRead(record.buffer, record.bufferLength);
 
-                manager->indexBeingRetrieved = -1;
-                manager->startRetrieval();
+                Serial.print(F("  For record "));
+                Serial.print(manager->indexBeingRetrieved);
+                Serial.print(F(" - name = "));
+                Serial.print(record.name);
+                Serial.println();
+                Serial.print(F("  Buffer length = "));
+                Serial.print(record.bufferLength);
+                Serial.println();
+
+                request->responseRead(record.buffer, record.bufferLength);
             }
+
+            manager->indexBeingRetrieved = -1;
+            manager->startRetrieval();
         }
     }
 
