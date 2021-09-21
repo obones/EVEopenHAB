@@ -31,6 +31,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include "EOConstants.h"
 #include "EOItem.h"
 #include "EOTagManager.h"
+#include "EOIconManager.h"
 
 #define OHAB_CMD_UP 0
 #define OHAB_CMD_DOWN 1
@@ -75,7 +76,7 @@ void EVE_cmd_track_burst(int16_t x0, int16_t y0, int16_t w0, int16_t h0, int16_t
 
     void Widget::Render()
     {
-        Point textPoint = ClientToScreen(0, Height() / 2);
+        Point textPoint = ClientToScreen(70, Height() / 2);
         Point topLeft = ClientToScreen(0, 0);
         Point bottomRight = ClientToScreen(Width(), Height());
 
@@ -92,6 +93,9 @@ void EVE_cmd_track_burst(int16_t x0, int16_t y0, int16_t w0, int16_t h0, int16_t
         EVE_cmd_dl_burst(VERTEX2F(bottomRight.X - rectanglePenWidth, bottomRight.Y - rectanglePenWidth));
     	EVE_cmd_dl_burst(LINE_WIDTH(1 * 16)); // size is in 1/16 pixel for this command, regardless of format
         EVE_cmd_dl_burst(DL_END);
+
+        uint8_t bitmapIndex = IconManager::Instance()->GetIconIndex(icon.c_str(), linkedItem.State().AsString().c_str());
+        IconManager::Instance()->BurstIcon(bitmapIndex, topLeft.X + 5, topLeft.Y + 5);
 
         EVE_cmd_dl_burst(DL_COLOR_RGB | BLACK);
         EVE_cmd_text_burst(textPoint.X, textPoint.Y, fontIndex, EVE_OPT_CENTERY, label.c_str());
