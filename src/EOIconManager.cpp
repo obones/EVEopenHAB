@@ -46,8 +46,6 @@ namespace EVEopenHAB
     
     void IconManager::MainLoop()
     {
-        return;
-
         for (int recordIndex = 0; recordIndex < records.size(); recordIndex++)
         {
             iconRecord& record = records[recordIndex];
@@ -131,8 +129,6 @@ namespace EVEopenHAB
 
     void IconManager::startRetrieval()
     {
-        return;
-
         int recordIndex = 0;
         while (indexBeingRetrieved < 0 && recordIndex < records.size())
         {
