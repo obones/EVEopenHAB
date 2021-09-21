@@ -36,6 +36,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include "EOHomepage.h"
 #include "EOConstants.h"
 #include "EOTouch.h"
+#include "EOIconManager.h"
 
 #include <EVE.h>
 #include <EVE_commands.h>
@@ -209,6 +210,8 @@ namespace EVEopenHAB
         }
 
         EVEopenHAB::Touch::MainLoop();
+
+        EVEopenHAB::IconManager::Instance()->MainLoop();
 
         // homepage display
         if (homepage && homepage->IsDirty())
