@@ -233,7 +233,7 @@ namespace EVEopenHAB
             spi_transmit_burst(ICON_BYTE_COUNT);
 
             EVE_cmd_dl_burst(BITMAP_HANDLE(index));
-            EVE_cmd_dl_burst(BITMAP_LAYOUT(EVE_ARGB4, ICON_WIDTH * ICON_BYTES_PER_PIXEL, ICON_HEIGHT));
+            EVE_cmd_dl_burst(BITMAP_LAYOUT(EVE_PALETTED4444, ICON_WIDTH * ICON_BYTES_PER_PIXEL, ICON_HEIGHT));
             EVE_cmd_dl_burst(BITMAP_SOURCE(record.address));
             EVE_cmd_dl_burst(BITMAP_SIZE(EVE_NEAREST, EVE_BORDER, EVE_BORDER, ICON_WIDTH, ICON_HEIGHT));
             EVE_cmd_dl_burst(DL_COLOR_RGB | WHITE);
