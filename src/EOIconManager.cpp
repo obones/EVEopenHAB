@@ -57,13 +57,13 @@ namespace EVEopenHAB
                 case BitmapState::Allocated:
                     if (record.buffer == nullptr)
                     {
-                        Serial.print("Setting memory for ");
+                        /*Serial.print("Setting memory for ");
                         Serial.print(recordIndex);
                         Serial.print(" - address = ");
                         Serial.print(record.address);
                         Serial.print(" - byte count = ");
                         Serial.print(ICON_BYTE_COUNT);
-                        Serial.println();
+                        Serial.println();*/
 
                         //EVE_cmd_memzero(record.address, ICON_BYTE_COUNT);
                         EVE_cmd_memset(record.address, 0xF0, ICON_BYTE_COUNT);
@@ -204,19 +204,15 @@ namespace EVEopenHAB
         {
             iconRecord& record = records[index - 1];
 
-            Serial.print("Bursting icon for ");
-            Serial.print(index - 1);
+            /*Serial.print("Bursting icon ");
+            Serial.print(index);
             Serial.print(" - address = ");
             Serial.print(record.address);
-            Serial.print(" - name = ");
-            Serial.print(reinterpret_cast<uint32_t>(record.name));
-            Serial.print(" - state = ");
-            Serial.print(reinterpret_cast<uint32_t>(record.state));
             Serial.print(" - at ");
             Serial.print(x);
             Serial.print(" ; ");
             Serial.print(y);
-            Serial.println();
+            Serial.println();*/
 
             //EVE_cmd_memset_burst(record.address, 0xF0, ICON_BYTE_COUNT);
             spi_transmit_burst(CMD_MEMSET);
