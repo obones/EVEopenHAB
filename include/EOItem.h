@@ -59,9 +59,9 @@ namespace EVEopenHAB
         public:
             Item(JsonObject sourceObject);
         
-            ItemType Type();
-            String Link();
-            ParsedState State();
+            ItemType Type() const;
+            const String& Link() const;
+            const ParsedState& State() const;
 
             void SetState(const char* strValue);
     };

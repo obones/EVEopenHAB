@@ -27,24 +27,24 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 namespace EVEopenHAB 
 {
-    Item::Item(JsonObject sourceObject): state(sourceObject["state"].as<const char*>())
+    Item::Item(JsonObject sourceObject): state(sourceObject["state"].as<String>())
     {
         if (!EnumString<ItemType>::To(type, sourceObject["type"].as<const char*>()))
             type = ItemType::Unsupported;
         link = sourceObject["link"].as<String>();
     }
 
-    ItemType Item::Type()
+    ItemType Item::Type() const
     {
         return type;
     }
 
-    String Item::Link()
+    const String& Item::Link() const
     {
         return link;
     }
 
-    ParsedState Item::State()
+    const ParsedState& Item::State() const
     {
         return state;
     }

@@ -36,14 +36,14 @@ namespace EVEopenHAB
             bool asBoolean;
             float asNumber;
 
-            bool parseBoolean(String sourceValue);
-            float parseNumber(String sourceValue);
+            bool parseBoolean(const String& sourceValue);
+            float parseNumber(const String& sourceValue);
         public:
-            ParsedState(const char* sourceValue);
+            ParsedState(const String& sourceValue);
 
-            String AsString();
-            bool AsBoolean();
-            float AsNumber();
+            const String& AsString() const;
+            bool AsBoolean() const;
+            float AsNumber() const;
     };
 }
 

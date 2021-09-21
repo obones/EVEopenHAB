@@ -23,13 +23,14 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 */
 
+#include <Arduino.h>
 #include <limits>
 
 #include "EOParsedState.h"
 
 namespace EVEopenHAB 
 {
-    ParsedState::ParsedState(const char* sourceValue)
+    ParsedState::ParsedState(const String& sourceValue)
     {
         asString = sourceValue;
 
@@ -37,22 +38,22 @@ namespace EVEopenHAB
         asNumber = parseNumber(asString);
     }
 
-    String ParsedState::AsString()
+    const String& ParsedState::AsString() const
     {
         return asString;
     }
     
-    bool ParsedState::AsBoolean()
+    bool ParsedState::AsBoolean() const
     {
         return asBoolean;
     }
 
-    float ParsedState::AsNumber()
+    float ParsedState::AsNumber() const
     {
         return asNumber;
     }
 
-    bool ParsedState::parseBoolean(String sourceValue)
+    bool ParsedState::parseBoolean(const String& sourceValue)
     {
         if (sourceValue == "ON")
             return true;
@@ -66,7 +67,7 @@ namespace EVEopenHAB
         return false;
     }
 
-    float ParsedState::parseNumber(String sourceValue)
+    float ParsedState::parseNumber(const String& sourceValue)
     {
         if (sourceValue == "ON")
             return 100.0;
