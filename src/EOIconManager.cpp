@@ -75,6 +75,12 @@ namespace EVEopenHAB
                 case BitmapState::Initialized:
                     if (record.buffer != nullptr)
                     {
+                        Serial.print("Loading image for ");
+                        Serial.print(recordIndex);
+                        Serial.print(" - address = ");
+                        Serial.print(record.address);
+                        Serial.println();
+
                         EVE_cmd_loadimage(record.address, EVE_OPT_NODL, record.buffer, record.bufferLength);
                         record.bitmapState = BitmapState::Loaded;
                     }
