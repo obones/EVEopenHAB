@@ -231,7 +231,7 @@ namespace EVEopenHAB
             EVE_cmd_dl_burst(DL_COLOR_RGB | WHITE);
             EVE_cmd_dl_burst(COLOR_A(255));
             EVE_cmd_dl_burst(DL_BEGIN | EVE_BITMAPS);
-            EVE_cmd_dl_burst(VERTEX2II(x, y, index, 0));
+            EVE_cmd_dl_burst(VERTEX2F(x, y));
             EVE_cmd_dl_burst(DL_END);
             EVE_cmd_dl_burst(BITMAP_HANDLE(0));
         }
