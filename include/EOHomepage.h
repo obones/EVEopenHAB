@@ -28,6 +28,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include <ArduinoJson.h>
 #include <WString.h>
 #include <vector>
+#include <functional>
 #include "EOWidget.h"
 #include "EOBase.h"
 
@@ -35,15 +36,20 @@ namespace EVEopenHAB
 {
     class Homepage: public Base 
     {
+        public:
+            typedef std::function<void()> OnReloadTouched;
         private:
             String id;
             std::vector<Widget*> widgets;
             bool isDirty = true;
+            OnReloadTouched onReloadTouched;
         protected:
             void SetDirty();
         public:
             Homepage(JsonObject sourceObject);
             virtual ~Homepage();
+
+            void SetOnReloadTouched(OnReloadTouched value);
 
             Rect ClientRect();
             void LayoutChildren();

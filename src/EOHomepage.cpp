@@ -27,6 +27,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include "EOHomepage.h"
 #include "EOConstants.h"
 #include "EOTagManager.h"
+#include "EOIconManager.h"
 
 namespace EVEopenHAB 
 {
@@ -47,6 +48,11 @@ namespace EVEopenHAB
         for (int widgetIndex = 0; widgetIndex < widgets.size(); widgetIndex++)
             delete widgets[widgetIndex];
         widgets.clear();
+    }
+
+    void Homepage::SetOnReloadTouched(OnReloadTouched value)
+    {
+        onReloadTouched = value;
     }
 
     Rect Homepage::ClientRect()
@@ -95,6 +101,16 @@ namespace EVEopenHAB
         // Black text
         EVE_cmd_dl_burst(DL_COLOR_RGB | BLACK);
         EVE_cmd_text_burst(EVE_HSIZE/2, 15, 29, EVE_OPT_CENTERX, "EVEopenHAB");
+
+        EVE_cmd_dl_burst(TAG(TagManager::Instance()->GetNextTag(
+            [=](uint8_t tag, uint16_t trackedValue) 
+            { 
+                if (onReloadTouched)
+                    onReloadTouched();
+            }
+        )));
+        IconManager::Instance()->BurstReloadIcon(EVE_HSIZE - 40, 10);
+        EVE_cmd_dl_burst(TAG(0)); 
 
         for (int widgetIndex = 0; widgetIndex < widgets.size(); widgetIndex++)
         {
