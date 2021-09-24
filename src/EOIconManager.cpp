@@ -83,6 +83,10 @@ namespace EVEopenHAB
 
                         EVE_cmd_loadimage(record.address, EVE_OPT_NODL, record.buffer, record.bufferLength);
                         record.bitmapState = BitmapState::Loaded;
+
+                        // Release memory now that the image is transferred to EVE
+                        delete record.buffer;
+                        record.buffer = nullptr;
                     }
                     break;
                 case BitmapState::Loaded:
