@@ -160,6 +160,8 @@ namespace EVEopenHAB
                     widgetIndex++;
                 }*/
 
+                IconManager::Instance()->Reset();
+
                 if (homepage)
                     delete homepage;
                     
