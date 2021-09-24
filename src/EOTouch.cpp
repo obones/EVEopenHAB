@@ -25,6 +25,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 #include <Arduino.h>
 #include <LITTLEFS.h>
+#include <EVE.h>
 #include "EOTagManager.h"
 #include "EOConstants.h"
 
