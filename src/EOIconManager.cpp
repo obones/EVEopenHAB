@@ -231,12 +231,6 @@ namespace EVEopenHAB
             Serial.print(y);
             Serial.println();*/
 
-            //EVE_cmd_memset_burst(record.address, 0xF0, ICON_BYTE_COUNT);
-            spi_transmit_burst(CMD_MEMSET);
-            spi_transmit_burst(record.address);
-            spi_transmit_burst((uint32_t) 0xF0);
-            spi_transmit_burst(ICON_BYTE_COUNT);
-
             EVE_cmd_dl_burst(BITMAP_HANDLE(index));
             EVE_cmd_dl_burst(BITMAP_LAYOUT(EVE_ARGB4, ICON_WIDTH * ICON_BYTES_PER_PIXEL, ICON_HEIGHT));
             EVE_cmd_dl_burst(BITMAP_SOURCE(record.address));
