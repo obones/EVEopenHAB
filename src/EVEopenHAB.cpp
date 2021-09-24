@@ -166,6 +166,12 @@ namespace EVEopenHAB
                     delete homepage;
                     
                 homepage = new Homepage(doc["homepage"].as<JsonObject>());
+                homepage->SetOnReloadTouched(
+                    [=]()
+                    {
+                        requestSent = false;
+                    }
+                );
                 for (int widgetIndex = 0; widgetIndex < homepage->Widgets().size(); widgetIndex++)
                 {
                     Serial.print("Widget ");
