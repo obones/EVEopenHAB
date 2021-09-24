@@ -26,6 +26,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #define EOICONMANAGER_H
 
 #include <vector>
+#include <asyncHTTPrequest.h>
 
 namespace EVEopenHAB 
 {
