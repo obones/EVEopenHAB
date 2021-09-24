@@ -126,8 +126,12 @@ void EVE_cmd_track_burst(int16_t x0, int16_t y0, int16_t w0, int16_t h0, int16_t
                 const int16_t trackHeight = sliderHeight; 
                 const int16_t trackWidth = sliderWidth; 
 
-                uint8_t tag = TagManager::Instance()->GetNextTag(this, &EVEopenHAB::Widget::sendSliderValue, nullptr);
-
+                uint8_t tag = TagManager::Instance()->GetNextTag(
+                    [=](uint8_t tag, uint16_t trackedValue) 
+                    { 
+                        sendSliderValue(tag, trackedValue); 
+                    }
+                );
                 EVE_cmd_track_burst(trackPoint.X, trackPoint.Y, trackWidth, trackHeight, tag);
 
                 EVE_cmd_dl_burst(COLOR_RGB(255, 170, 0));
@@ -149,20 +153,35 @@ void EVE_cmd_track_burst(int16_t x0, int16_t y0, int16_t w0, int16_t h0, int16_t
                         EVE_cmd_fgcolor_burst(0xDDDDDD);
                         Point buttonPoint = ClientToScreen(Width() - buttonSize - buttonRightMargin, (Height() - buttonSize) / 2);
 
-                        EVE_cmd_dl_burst(TAG(TagManager::Instance()->GetNextTag(this, &EVEopenHAB::Widget::sendCommand, reinterpret_cast<void*>(OHAB_CMD_UP))));
+                        EVE_cmd_dl_burst(TAG(TagManager::Instance()->GetNextTag(
+                            [=](uint8_t tag, uint16_t trackedValue) 
+                            { 
+                                sendCommand(tag, OHAB_CMD_UP);
+                            }
+                        )));
                         EVE_cmd_dl_burst(CMD_LOADIDENTITY);
                         EVE_cmd_translate_burst(0, 3 * 65536 + 5);
                         EVE_cmd_dl_burst(CMD_SETMATRIX);
                         EVE_cmd_button_burst(buttonPoint.X, buttonPoint.Y, buttonSize, buttonSize, fontIndex, EVE_OPT_FLAT, "^");
 
                         buttonPoint.X -= buttonSize + buttonRightMargin;
-                        EVE_cmd_dl_burst(TAG(TagManager::Instance()->GetNextTag(this, &EVEopenHAB::Widget::sendCommand, reinterpret_cast<void*>(OHAB_CMD_STOP))));
+                        EVE_cmd_dl_burst(TAG(TagManager::Instance()->GetNextTag(
+                            [=](uint8_t tag, uint16_t trackedValue) 
+                            { 
+                                sendCommand(tag, OHAB_CMD_STOP);
+                            }
+                        )));
                         EVE_cmd_dl_burst(CMD_LOADIDENTITY);
                         EVE_cmd_dl_burst(CMD_SETMATRIX);
                         EVE_cmd_button_burst(buttonPoint.X, buttonPoint.Y, buttonSize, buttonSize, fontIndex - 1, EVE_OPT_FLAT, "X");
 
                         buttonPoint.X -= buttonSize + buttonRightMargin;
-                        EVE_cmd_dl_burst(TAG(TagManager::Instance()->GetNextTag(this, &EVEopenHAB::Widget::sendCommand, reinterpret_cast<void*>(OHAB_CMD_DOWN))));
+                        EVE_cmd_dl_burst(TAG(TagManager::Instance()->GetNextTag(
+                            [=](uint8_t tag, uint16_t trackedValue) 
+                            { 
+                                sendCommand(tag, OHAB_CMD_DOWN);
+                            }
+                        )));
                         EVE_cmd_dl_burst(CMD_LOADIDENTITY);
                         EVE_cmd_rotatearound_burst(4, 10, 32768, 65536);
                         EVE_cmd_dl_burst(CMD_SETMATRIX);
@@ -199,24 +218,22 @@ void EVE_cmd_track_burst(int16_t x0, int16_t y0, int16_t w0, int16_t h0, int16_t
         postRequest.send(value);
     }
 
-    void Widget::sendCommand(uint8_t tag, uint16_t trackedValue, void* customData)
+    void Widget::sendCommand(uint8_t tag, int command)
     {
         Serial.print("Widget ");
         Serial.print(label);
         Serial.print(" received tag ");
         Serial.print(tag);
-        Serial.print(" - tracked value = ");
-        Serial.print(trackedValue);
-        Serial.print(" - customData = ");
-        Serial.printf("%p", customData);
+        Serial.print(" - command = ");
+        Serial.printf("%d", command);
         Serial.println("");
 
         const char* commands[] = { "UP", "DOWN", "STOP" };
 
-        postItemValue(commands[reinterpret_cast<int>(customData)]);
+        postItemValue(commands[command]);
     }
 
-    void Widget::sendSliderValue(uint8_t tag, uint16_t trackedValue, void* customData)
+    void Widget::sendSliderValue(uint8_t tag, uint16_t trackedValue)
     {
         Serial.print("Widget ");
         Serial.print(label);
@@ -224,8 +241,6 @@ void EVE_cmd_track_burst(int16_t x0, int16_t y0, int16_t w0, int16_t h0, int16_t
         Serial.print(tag);
         Serial.print(" - tracked value = ");
         Serial.print(trackedValue);
-        Serial.print(" - customData = ");
-        Serial.printf("%p", customData);
         Serial.println("");
 
         String positionStr = String(((int32_t)trackedValue * 100) / 65535);

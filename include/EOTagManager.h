@@ -26,31 +26,21 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #define EOTAGMANAGER_H
 
 #include <Arduino.h>
-#include <EVE.h>
 #include <functional>
-
-#include "EOWidget.h"
 
 namespace EVEopenHAB 
 {
     class TagManager
     {
         public:
-            typedef std::function<void(Widget*, uint8_t tag, uint16_t trackedValue, void* customData)> TagCallBack;
+            typedef std::function<void(uint8_t tag, uint16_t trackedValue)> TagCallBack;
         private:
-            typedef struct
-            {
-                Widget* object;
-                TagCallBack callback;
-                void* customData;
-            } tagRecord;
-            
-            std::vector<tagRecord> records;
+            std::vector<TagCallBack> callbacks;
 
             TagManager() {}
         public:
             void Reset();
-            uint8_t GetNextTag(Widget* object, TagCallBack callback, void* customData);
+            uint8_t GetNextTag(TagCallBack callback);
             void Invoke(uint8_t tag, uint16_t trackedValue);
 
             static TagManager* Instance();

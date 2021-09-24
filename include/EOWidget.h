@@ -62,8 +62,8 @@ namespace EVEopenHAB
             bool visibility;
             Item linkedItem;
 
-            void sendCommand(uint8_t tag, uint16_t trackedValue, void* customData);
-            void sendSliderValue(uint8_t tag, uint16_t trackedValue, void* customData);
+            void sendCommand(uint8_t tag, int command);
+            void sendSliderValue(uint8_t tag, uint16_t trackedValue);
             void postItemValue(const char* value);
         public:
             Widget(Base* parent, JsonObject sourceObject);

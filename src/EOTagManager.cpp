@@ -29,24 +29,24 @@ namespace EVEopenHAB
 {
     void TagManager::Reset()
     {
-        records.clear();
+        callbacks.clear();
     }
 
-    uint8_t TagManager::GetNextTag(Widget* object, TagCallBack callback, void* customData)
+    uint8_t TagManager::GetNextTag(TagCallBack callback)
     {
-        if (records.size() == 254)
+        if (callbacks.size() == 254)
             return 0;
         
-        records.push_back( { .object = object, .callback = callback, .customData = customData } );
-        return records.size();
+        callbacks.push_back(callback);
+        return callbacks.size();
     }
 
     void TagManager::Invoke(uint8_t tag, uint16_t trackedValue)
     {
-        if (tag > 0 && tag <= records.size())
+        if (tag > 0 && tag <= callbacks.size())
         {
-            auto record = records[tag - 1];
-            record.callback(record.object, tag, trackedValue, record.customData);
+            auto callback = callbacks[tag - 1];
+            callback(tag, trackedValue);
         }
     }
 
