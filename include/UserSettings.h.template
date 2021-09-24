@@ -13,3 +13,4 @@
 // Do not add a trailing slash on the URL
 #define BASE_URL "http://openhabhost:8080"
 #define SITEMAP_NAME "mysitemap"
+#define ICON_SET_NAME "eve"
