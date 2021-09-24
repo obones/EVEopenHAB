@@ -47,10 +47,13 @@ namespace EVEopenHAB
             
             std::vector<iconRecord> records;
 
+            bool staticIconsLoaded = false;
+            uint32_t reloadIconAddress = 0;
+
             int16_t indexBeingRetrieved = -1;
             void startRetrieval();
 
-            IconManager() {}
+            IconManager();
 
             friend void iconRequestReadyStateChange(void*, asyncHTTPrequest*, int);
         public:
@@ -61,6 +64,9 @@ namespace EVEopenHAB
             int8_t GetIconIndex(const char* name, const char* state); // returns the index of the icon matching name and state
             uint32_t GetAddress(int8_t index);
             void BurstIcon(int8_t index, int16_t x, int16_t y);
+
+            uint32_t GetReloadIconAddress() const;
+            void BurstReloadIcon(int16_t x, int16_t y);
 
             static IconManager* Instance();
     };

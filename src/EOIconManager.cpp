@@ -30,6 +30,8 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include "EOSettings.h"
 #include "EOConstants.h"
 
+#include "reload_color.png.h"
+
 #define ICON_HEIGHT 64
 #define ICON_WIDTH 64
 #define ICON_BYTES_PER_PIXEL 2
@@ -38,14 +40,25 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 // We are loading PNG files and the datasheet clearly states that the top 42K of RAM_G will be used as a temporary buffer
 #define RAM_G_MAX_USABLE_ADDRESS (EVE_RAM_G + EVE_RAM_G_SIZE - 42*1024)
 #define RAM_G_BOTTOM 0
-// (EVE_RAM_G + EVE_RAM_G_SIZE / 2)
 
 namespace EVEopenHAB 
 {
     asyncHTTPrequest iconRequest;
+
+    IconManager::IconManager()
+    {
+        reloadIconAddress = RAM_G_MAX_USABLE_ADDRESS - reload_color_png_byte_count;
+    }
     
     void IconManager::MainLoop()
     {
+        if (!staticIconsLoaded)
+        {
+            EVE_cmd_loadimage(reloadIconAddress, EVE_OPT_NODL, reload_color_png, sizeof(reload_color_png));
+
+            staticIconsLoaded = true;
+        }
+
         for (int recordIndex = 0; recordIndex < records.size(); recordIndex++)
         {
             iconRecord& record = records[recordIndex];
@@ -243,4 +256,24 @@ namespace EVEopenHAB
             EVE_cmd_dl_burst(BITMAP_HANDLE(0));
         }
     }
+
+    uint32_t IconManager::GetReloadIconAddress() const
+    {
+        return reloadIconAddress;
+    }
+
+    void IconManager::BurstReloadIcon(int16_t x, int16_t y)
+    {
+        EVE_cmd_dl_burst(BITMAP_HANDLE(15));
+        EVE_cmd_dl_burst(BITMAP_LAYOUT(reload_color_png_format, reload_color_png_width * reload_color_png_bytes_per_pixel, reload_color_png_height));
+        EVE_cmd_dl_burst(BITMAP_SOURCE(reloadIconAddress));
+        EVE_cmd_dl_burst(BITMAP_SIZE(EVE_NEAREST, EVE_BORDER, EVE_BORDER, reload_color_png_width, reload_color_png_height));
+        EVE_cmd_dl_burst(DL_COLOR_RGB | WHITE);
+        EVE_cmd_dl_burst(COLOR_A(255));
+        EVE_cmd_dl_burst(DL_BEGIN | EVE_BITMAPS);
+        EVE_cmd_dl_burst(VERTEX2F(x, y));
+        EVE_cmd_dl_burst(DL_END);
+        EVE_cmd_dl_burst(BITMAP_HANDLE(0));
+    }
+
 }
