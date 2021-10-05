@@ -112,8 +112,9 @@ namespace EVEopenHAB
             while (EVE_busy());    
         }
 
-        void MainLoop()
+        bool MainLoop()
         {
+            bool result = false;
             uint32_t current_millis = millis();
             static uint32_t previous_millis = 0;
 
@@ -128,6 +129,10 @@ namespace EVEopenHAB
 
                     uint8_t tag = 0;
                     uint16_t trackedValue = 0;
+
+                    uint32_t fourthTouch = EVE_memRead32(REG_CTOUCH_TOUCH3_XY);
+                    result = ((fourthTouch != 0) && (fourthTouch != 0x80008000));
+                    //Serial.printf("Fourth touch = %x\r\n", fourthTouch);
 
                     uint32_t trackerInfo = EVE_memRead32(REG_TRACKER); // read the first tracker
                     if (trackerInfo)    
@@ -155,6 +160,7 @@ namespace EVEopenHAB
                     previousTrackedValue = trackedValue;
                 }
             }
+            return result;
         }
     }
 }

@@ -30,7 +30,7 @@ namespace EVEopenHAB
     namespace Touch
     {
         void Setup();
-        void MainLoop();
+        bool MainLoop();  // true if fourth touch point was seen
     }
 }
 
