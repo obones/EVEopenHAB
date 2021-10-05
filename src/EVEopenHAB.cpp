@@ -37,6 +37,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include "EOConstants.h"
 #include "EOTouch.h"
 #include "EOIconManager.h"
+#include "EOFourthDimension.h"
 
 #include <EVE.h>
 #include <EVE_commands.h>
@@ -190,6 +191,8 @@ namespace EVEopenHAB
     // must be a global variable because it needs to survive the end of the MainLoop call below
     asyncHTTPrequest request;
 
+    static bool fourthDimension = false;
+
     void MainLoop()
     {
         EVEopenHAB::Wifi::MainLoop();
@@ -217,15 +220,27 @@ namespace EVEopenHAB
             request.send();
         }
 
-        EVEopenHAB::Touch::MainLoop();
-
-        EVEopenHAB::IconManager::Instance()->MainLoop();
-
-        // homepage display
-        if (homepage && homepage->IsDirty())
+        if (EVEopenHAB::Touch::MainLoop())
         {
-            homepage->LayoutChildren();
-            homepage->Render();
+            EVEopenHAB::FourthDimension::Enter();
+            fourthDimension = true;
+        }
+
+        if (fourthDimension)
+        {
+            if (!EVEopenHAB::FourthDimension::MainLoop())
+                fourthDimension = false;
+        }
+        else
+        {
+            EVEopenHAB::IconManager::Instance()->MainLoop();
+
+            // homepage display
+            if (homepage && homepage->IsDirty())
+            {
+                homepage->LayoutChildren();
+                homepage->Render();
+            }
         }
     }
 }
