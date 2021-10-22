@@ -33,6 +33,12 @@ namespace EVEopenHAB
 {
     namespace FourthDimension
     {
+        void EVE_cmd_newlist_burst(uint32_t adr)
+        {
+            spi_transmit_burst(CMD_NEWLIST);
+            spi_transmit_burst(adr);
+        }
+
         void Enter()
         {
             EVE_start_cmd_burst();
