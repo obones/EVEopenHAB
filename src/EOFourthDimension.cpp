@@ -41,8 +41,40 @@ namespace EVEopenHAB
 
         void Enter()
         {
+            typedef struct {
+                int16_t X;
+                int16_t Y;
+                int16_t deltaX;
+                int16_t deltaY;
+            } starInfo;
+            
+            starInfo stars[6] = 
+                { 
+                    { .X = EVE_HSIZE / 5, .Y = EVE_VSIZE / 3, .deltaX = +10, .deltaY = -4 },
+                    { .X = (3 * EVE_HSIZE) / 5, .Y = (2 * EVE_VSIZE) / 3, .deltaX = +20, .deltaY = +5 },
+                    { .X = (4 * EVE_HSIZE) / 5, .Y = EVE_VSIZE / 3, .deltaX = -20, .deltaY = -4 },
+                    { .X = (2 * EVE_HSIZE) / 5, .Y = (2 * EVE_VSIZE) / 3, .deltaX = +15, .deltaY = 0 },
+                    { .X = EVE_HSIZE / 7, .Y = EVE_VSIZE / 6, .deltaX = 0, .deltaY = -8 },
+                    { .X = (3 * EVE_HSIZE) / 7, .Y = (7 * EVE_VSIZE) / 9, .deltaX = -9, .deltaY = -4 },
+                };
+            const int starsCount = sizeof(stars) / sizeof(starInfo);
+            const uint32_t BASE_LIST_ADDR = EVE_RAM_G + 0;
+            const uint32_t STAR_LIST_ADDR = EVE_RAM_G + 0x100;
+
+            // The display list never changes, only the stars coordinates. To avoid sending the entire list
+            // at each refresh, we use two display lists (BT817 specific):
+            // The first only contains the stars VERTEX2F orders and a CMD_RETURN
+            // The second contains the static part of the display list (background + text)
             EVE_start_cmd_burst();
-            EVE_cmd_dl_burst(CMD_DLSTART); 
+            EVE_cmd_newlist_burst(STAR_LIST_ADDR);
+            for (int starIndex = 0; starIndex < starsCount; starIndex ++)
+                EVE_cmd_dl_burst(VERTEX2F(stars[starIndex].X, stars[starIndex].Y));
+            EVE_cmd_dl_burst(CMD_ENDLIST);
+            EVE_end_cmd_burst();
+            while (EVE_busy());
+
+            EVE_start_cmd_burst();
+            EVE_cmd_newlist_burst(BASE_LIST_ADDR);
         	EVE_cmd_dl_burst(VERTEX_FORMAT(0)); 
             EVE_cmd_dl_burst(DL_CLEAR_RGB | BLACK);
             EVE_cmd_dl_burst(DL_CLEAR | CLR_COL | CLR_STN | CLR_TAG);
@@ -50,24 +82,56 @@ namespace EVEopenHAB
             EVE_cmd_text_burst(EVE_HSIZE / 2, EVE_VSIZE / 2, 24, EVE_OPT_CENTERX, "Entering the fourth dimension...");
             EVE_cmd_dl_burst(POINT_SIZE(32));
             EVE_cmd_dl_burst(DL_BEGIN | EVE_POINTS);
-            EVE_cmd_dl_burst(VERTEX2F(EVE_HSIZE / 5, EVE_VSIZE / 3));
-            EVE_cmd_dl_burst(VERTEX2F((3 * EVE_HSIZE) / 5, (2 * EVE_VSIZE) / 3));
-            EVE_cmd_dl_burst(VERTEX2F((4 * EVE_HSIZE) / 5, (EVE_VSIZE / 3)));
-            EVE_cmd_dl_burst(VERTEX2F((2 * EVE_HSIZE) / 5, (2 * EVE_VSIZE) / 3));
-            EVE_cmd_dl_burst(VERTEX2F(EVE_HSIZE / 7, EVE_VSIZE / 6));
-            EVE_cmd_dl_burst(VERTEX2F((3 * EVE_HSIZE) / 7, (7 * EVE_VSIZE) / 9));
+            EVE_cmd_calllist_burst(STAR_LIST_ADDR);
             EVE_cmd_dl_burst(DL_END);
-
-            EVE_cmd_dl_burst(DL_DISPLAY);
-            EVE_cmd_dl_burst(CMD_SWAP); // tell EVE to use the new display list
-
+            EVE_cmd_dl_burst(CMD_ENDLIST);
             EVE_end_cmd_burst();
-            while (EVE_busy());    
+            while (EVE_busy());
 
             EVE_memWrite32(REG_SOUND, 0x14);
             EVE_memWrite32(REG_VOL_SOUND, 0xFF);
             EVE_memWrite32(REG_PLAY, 0x01);
-            sleep(5);
+
+            uint32_t starsRAMAddress = STAR_LIST_ADDR;
+            Serial.printf("starsRAMAddress = %x", starsRAMAddress);
+            Serial.println();
+
+            for (int stepIndex = 0; stepIndex < 70; stepIndex++)
+            {
+                // We would have loved for the BT817 to read its instructions directly from RAM_G when using call lists
+                // While it does that just fine with bitmaps content, it seems its importing the display items from
+                // RAM_G when the list is swapped. 
+                // Using a "static" display list that calls the variable one allows us to simply send the CMD_CALLLIST
+                // at each step of the animation.
+                EVE_start_cmd_burst();
+                EVE_cmd_dl_burst(CMD_DLSTART); 
+                EVE_cmd_calllist_burst(BASE_LIST_ADDR);
+                EVE_cmd_dl_burst(DL_DISPLAY);
+                EVE_cmd_dl_burst(CMD_SWAP);
+
+                EVE_end_cmd_burst();
+                while (EVE_busy());
+
+                usleep(50 * 1000);
+
+                // Move the stars to their next position
+                for (int starIndex = 0 ; starIndex < starsCount; starIndex++)
+                {
+                    stars[starIndex].X += stars[starIndex].deltaX;
+                    stars[starIndex].Y += stars[starIndex].deltaY;
+
+                    Serial.print("Writing star ");
+                    Serial.print(starIndex);
+                    Serial.print(" (");
+                    Serial.print(stars[starIndex].X);
+                    Serial.print("; ");
+                    Serial.print(stars[starIndex].Y);
+                    Serial.printf(") at address %x", starsRAMAddress + starIndex * sizeof(int32_t));
+                    Serial.println();
+
+                    EVE_memWrite32(starsRAMAddress + starIndex * sizeof(int32_t), VERTEX2F(stars[starIndex].X, stars[starIndex].Y));
+                }
+            }
         }
 
         bool MainLoop()
