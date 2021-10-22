@@ -28,6 +28,8 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include <EVE.h>
 #include "EOTagManager.h"
 #include "EOConstants.h"
+#include "grass16x16-png8.png.h"
+#include "mole64x48-png8.png.h"
 
 namespace EVEopenHAB 
 {
@@ -38,6 +40,15 @@ namespace EVEopenHAB
             spi_transmit_burst(CMD_NEWLIST);
             spi_transmit_burst(adr);
         }
+
+        const uint32_t GRASS_ADDR = EVE_RAM_G + 0x200;
+        const uint32_t MOLE_ADDR = EVE_RAM_G + 0x500;
+        const uint8_t GrassBitmapHandle = 13;
+        const uint8_t MoleBitmapHandle = 12;
+        uint32_t GrassSourceAddr;
+        uint32_t GrassPaletteAddr;
+        uint32_t MoleSourceAddr;
+        uint32_t MolePaletteAddr;
 
         void Enter()
         {
@@ -132,6 +143,17 @@ namespace EVEopenHAB
                     EVE_memWrite32(starsRAMAddress + starIndex * sizeof(int32_t), VERTEX2F(stars[starIndex].X, stars[starIndex].Y));
                 }
             }
+
+            // Now that the stars are gone, we can load the game images.
+            // Using the BT817 specific CMD_GETIMAGE makes it much easier to retrieve the image and palette
+            // addresses that will have to be used later on when rendering them.
+            uint32_t dummy;
+            
+            EVE_cmd_loadimage(GRASS_ADDR, EVE_OPT_NODL, grass_png, sizeof(grass_png));
+            EVE_cmd_getimage(&GrassSourceAddr, &dummy, &dummy, &dummy, &GrassPaletteAddr);
+
+            EVE_cmd_loadimage(MOLE_ADDR, EVE_OPT_NODL, mole_png, sizeof(mole_png));
+            EVE_cmd_getimage(&MoleSourceAddr, &dummy, &dummy, &dummy, &MolePaletteAddr);
         }
 
         bool MainLoop()
@@ -143,6 +165,50 @@ namespace EVEopenHAB
             if((current_millis - previous_millis) > 4) // execute the code every 5 milli-seconds
             {
                 previous_millis = current_millis;
+
+                EVE_start_cmd_burst();
+                EVE_cmd_dl_burst(CMD_DLSTART); 
+                EVE_cmd_dl_burst(TAG(0)); 
+                EVE_cmd_dl_burst(VERTEX_FORMAT(0));
+
+                EVE_cmd_dl_burst(BITMAP_HANDLE(GrassBitmapHandle));
+                EVE_cmd_dl_burst(BITMAP_LAYOUT(grass_png_format, grass_png_width * grass_png_bytes_per_pixel, grass_png_height));
+                EVE_cmd_dl_burst(BITMAP_SOURCE(GrassSourceAddr));
+                EVE_cmd_dl_burst(PALETTE_SOURCE(GrassPaletteAddr));
+                EVE_cmd_dl_burst(BITMAP_SIZE(EVE_NEAREST, EVE_REPEAT, EVE_REPEAT, EVE_HSIZE, EVE_VSIZE));
+                EVE_cmd_dl_burst(BITMAP_SIZE_H(EVE_HSIZE, EVE_VSIZE));
+                EVE_cmd_dl_burst(DL_COLOR_RGB | WHITE);
+                EVE_cmd_dl_burst(COLOR_A(255));
+                EVE_cmd_dl_burst(DL_BEGIN | EVE_BITMAPS);
+                EVE_cmd_dl_burst(VERTEX2F(0, 0));
+                EVE_cmd_dl_burst(DL_END);
+                EVE_cmd_dl_burst(BITMAP_HANDLE(0));
+
+                static uint8_t MoleTag = TagManager::Instance()->GetNextTag(
+                    [=](uint8_t tag, uint16_t trackedValue) 
+                    {
+
+                    }
+                );
+                EVE_cmd_dl_burst(TAG(MoleTag)); 
+                EVE_cmd_dl_burst(BITMAP_HANDLE(MoleBitmapHandle));
+                EVE_cmd_dl_burst(BITMAP_LAYOUT(mole_png_format, mole_png_width * mole_png_bytes_per_pixel, mole_png_height));
+                EVE_cmd_dl_burst(BITMAP_SOURCE(MoleSourceAddr));
+                EVE_cmd_dl_burst(PALETTE_SOURCE(MolePaletteAddr));
+                EVE_cmd_dl_burst(BITMAP_SIZE(EVE_NEAREST, EVE_BORDER, EVE_BORDER, mole_png_width, mole_png_height));
+                EVE_cmd_dl_burst(DL_COLOR_RGB | WHITE);
+                EVE_cmd_dl_burst(COLOR_A(255));
+                EVE_cmd_dl_burst(DL_BEGIN | EVE_BITMAPS);
+                EVE_cmd_dl_burst(VERTEX2F(EVE_HSIZE / 2, EVE_VSIZE / 2));
+                EVE_cmd_dl_burst(DL_END);
+                EVE_cmd_dl_burst(BITMAP_HANDLE(0));
+                EVE_cmd_dl_burst(TAG(0)); 
+
+                EVE_cmd_dl_burst(DL_DISPLAY);
+                EVE_cmd_dl_burst(CMD_SWAP);
+
+                EVE_end_cmd_burst();
+                while (EVE_busy());
             }
 
             return result;
