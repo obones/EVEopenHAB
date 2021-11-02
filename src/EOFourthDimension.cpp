@@ -41,14 +41,41 @@ namespace EVEopenHAB
             spi_transmit_burst(adr);
         }
 
-        const uint32_t GRASS_ADDR = EVE_RAM_G + 0x200;
-        const uint32_t MOLE_ADDR = EVE_RAM_G + 0x500;
+        /* -------- RAM Layout -------
+
+            The mole game uses various graphic elements stored in RAM_G so we must make sure they don't overlap
+            This is why it is a good idea to have this RAM map describing what gets stored and where.
+
+            Offset   Usage
+            0x0000   Grass sprite
+            0x0200   Mole sprite
+            0x0400   Mole coordinates display list
+            0x0410   Static display list
+        */
+
+        const uint32_t GRASS_BITMAP = EVE_RAM_G + 0x0000;
+        const uint32_t MOLE_BITMAP = EVE_RAM_G + 0x0200;
+        const uint32_t MOLE_COORDINATES_DL = EVE_RAM_G + 0x0400;
+        const uint32_t STATIC_DL = EVE_RAM_G + 0x0410;
+        const uint32_t TEXT_COLOR = 0xBB2200;
+
+        // Bitmap handles 16 to 31 are reserved, 1 to 15 have to be managed by us
         const uint8_t GrassBitmapHandle = 13;
         const uint8_t MoleBitmapHandle = 12;
-        uint32_t GrassSourceAddr;
-        uint32_t GrassPaletteAddr;
-        uint32_t MoleSourceAddr;
-        uint32_t MolePaletteAddr;
+        const uint8_t Font34BitmapHandle = 11;
+
+        typedef struct 
+        {
+            int16_t MoleX, MoleY;
+            int32_t TimeBeforeChange;
+            int32_t NextTimeBetweenChange;
+            int32_t Score;
+            int8_t LivesLeft;
+            bool ContinueToPlay;
+        } GameState;
+        const GameState StartGameState = { .MoleX = EVE_HSIZE / 2, .MoleY = EVE_VSIZE / 2, .TimeBeforeChange = 3000, .NextTimeBetweenChange = 3000, .Score = 0, .LivesLeft = 3, .ContinueToPlay = true};
+
+        GameState gameState = StartGameState;
 
         void Enter()
         {
@@ -147,62 +174,176 @@ namespace EVEopenHAB
             // Now that the stars are gone, we can load the game images.
             // Using the BT817 specific CMD_GETIMAGE makes it much easier to retrieve the image and palette
             // addresses that will have to be used later on when rendering them.
+            uint32_t GrassSourceAddr;
+            uint32_t GrassPaletteAddr;
+            uint32_t MoleSourceAddr;
+            uint32_t MolePaletteAddr;
             uint32_t dummy;
             
-            EVE_cmd_loadimage(GRASS_ADDR, EVE_OPT_NODL, grass_png, sizeof(grass_png));
+            EVE_cmd_loadimage(GRASS_BITMAP, EVE_OPT_NODL, grass_png, sizeof(grass_png));
             EVE_cmd_getimage(&GrassSourceAddr, &dummy, &dummy, &dummy, &GrassPaletteAddr);
 
-            EVE_cmd_loadimage(MOLE_ADDR, EVE_OPT_NODL, mole_png, sizeof(mole_png));
+            EVE_cmd_loadimage(MOLE_BITMAP, EVE_OPT_NODL, mole_png, sizeof(mole_png));
             EVE_cmd_getimage(&MoleSourceAddr, &dummy, &dummy, &dummy, &MolePaletteAddr);
+
+            TagManager::Instance()->Reset();
+
+            // As above with the stars, we create display list that simply places the mole sprite
+            EVE_start_cmd_burst();
+            EVE_cmd_newlist_burst(MOLE_COORDINATES_DL);
+            EVE_cmd_dl_burst(VERTEX2F(0, 0));
+            EVE_cmd_dl_burst(CMD_ENDLIST);
+
+            // We also create a "static" display list that gets all the commands that never change from one iteration to the next
+            // This saves a lot of bandwidth on the SPI bus
+            EVE_cmd_newlist_burst(STATIC_DL);
+            EVE_cmd_dl_burst(CMD_DLSTART); 
+            EVE_cmd_dl_burst(TAG(0)); 
+            EVE_cmd_dl_burst(VERTEX_FORMAT(0));
+
+            EVE_cmd_dl_burst(BITMAP_HANDLE(GrassBitmapHandle));
+            EVE_cmd_dl_burst(BITMAP_LAYOUT(grass_png_format, grass_png_width * grass_png_bytes_per_pixel, grass_png_height));
+            EVE_cmd_dl_burst(BITMAP_SOURCE(GrassSourceAddr));
+            EVE_cmd_dl_burst(PALETTE_SOURCE(GrassPaletteAddr));
+            EVE_cmd_dl_burst(BITMAP_SIZE(EVE_NEAREST, EVE_REPEAT, EVE_REPEAT, EVE_HSIZE, EVE_VSIZE));
+            EVE_cmd_dl_burst(BITMAP_SIZE_H(EVE_HSIZE, EVE_VSIZE));
+            EVE_cmd_dl_burst(DL_COLOR_RGB | WHITE);
+            EVE_cmd_dl_burst(COLOR_A(255));
+            EVE_cmd_dl_burst(DL_BEGIN | EVE_BITMAPS);
+            EVE_cmd_dl_burst(VERTEX2F(0, 0));
+            EVE_cmd_dl_burst(DL_END);
+            EVE_cmd_dl_burst(BITMAP_HANDLE(0));
+            EVE_cmd_dl_burst(DL_COLOR_RGB | TEXT_COLOR);
+            EVE_cmd_text_burst(5, 5, 29, 0, "Lives");
+            EVE_cmd_text_burst(EVE_HSIZE - 10, 5, 29, EVE_OPT_RIGHTX, "Score");
+
+            static uint8_t MoleTag = TagManager::Instance()->GetNextTag(
+                [&](uint8_t tag, uint16_t trackedValue) 
+                {
+                    // mole has been touched, award some points
+                    gameState.Score += 100 + gameState.TimeBeforeChange / 10;
+
+                    // hide the mole for half the timer time
+                    gameState.MoleY = -2 * mole_png_height;
+                    gameState.TimeBeforeChange = gameState.NextTimeBetweenChange / 2;  
+                }
+            );
+            EVE_cmd_dl_burst(TAG(MoleTag)); 
+            EVE_cmd_dl_burst(BITMAP_HANDLE(MoleBitmapHandle));
+            EVE_cmd_dl_burst(BITMAP_LAYOUT(mole_png_format, mole_png_width * mole_png_bytes_per_pixel, mole_png_height));
+            EVE_cmd_dl_burst(BITMAP_SOURCE(MoleSourceAddr));
+            EVE_cmd_dl_burst(PALETTE_SOURCE(MolePaletteAddr));
+            EVE_cmd_dl_burst(BITMAP_SIZE(EVE_NEAREST, EVE_BORDER, EVE_BORDER, mole_png_width, mole_png_height));
+            EVE_cmd_dl_burst(DL_COLOR_RGB | WHITE);
+            EVE_cmd_dl_burst(COLOR_A(255));
+            EVE_cmd_dl_burst(DL_BEGIN | EVE_BITMAPS);
+            EVE_cmd_calllist_burst(MOLE_COORDINATES_DL);
+            EVE_cmd_dl_burst(DL_END);
+            EVE_cmd_dl_burst(BITMAP_HANDLE(0));
+            EVE_cmd_dl_burst(TAG(0)); 
+            EVE_cmd_dl_burst(CMD_ENDLIST);
+
+            EVE_end_cmd_burst();
+            while (EVE_busy());
         }
 
         bool MainLoop()
         {
-            bool result = true;
             uint32_t current_millis = millis();
             static uint32_t previous_millis = 0;
+            static bool logLivesLeft = false;
 
             if((current_millis - previous_millis) > 4) // execute the code every 5 milli-seconds
             {
+                if (previous_millis > 0)
+                    gameState.TimeBeforeChange -= current_millis - previous_millis;
                 previous_millis = current_millis;
 
+                // Update mole coordinates
+                EVE_memWrite32(MOLE_COORDINATES_DL, VERTEX2F(gameState.MoleX, gameState.MoleY));
+
+                // Burst the periodic display list, that calls the RAM based static display list
                 EVE_start_cmd_burst();
                 EVE_cmd_dl_burst(CMD_DLSTART); 
                 EVE_cmd_dl_burst(TAG(0)); 
                 EVE_cmd_dl_burst(VERTEX_FORMAT(0));
+                EVE_cmd_calllist_burst(STATIC_DL);
 
-                EVE_cmd_dl_burst(BITMAP_HANDLE(GrassBitmapHandle));
-                EVE_cmd_dl_burst(BITMAP_LAYOUT(grass_png_format, grass_png_width * grass_png_bytes_per_pixel, grass_png_height));
-                EVE_cmd_dl_burst(BITMAP_SOURCE(GrassSourceAddr));
-                EVE_cmd_dl_burst(PALETTE_SOURCE(GrassPaletteAddr));
-                EVE_cmd_dl_burst(BITMAP_SIZE(EVE_NEAREST, EVE_REPEAT, EVE_REPEAT, EVE_HSIZE, EVE_VSIZE));
-                EVE_cmd_dl_burst(BITMAP_SIZE_H(EVE_HSIZE, EVE_VSIZE));
-                EVE_cmd_dl_burst(DL_COLOR_RGB | WHITE);
-                EVE_cmd_dl_burst(COLOR_A(255));
-                EVE_cmd_dl_burst(DL_BEGIN | EVE_BITMAPS);
-                EVE_cmd_dl_burst(VERTEX2F(0, 0));
-                EVE_cmd_dl_burst(DL_END);
-                EVE_cmd_dl_burst(BITMAP_HANDLE(0));
-
-                static uint8_t MoleTag = TagManager::Instance()->GetNextTag(
-                    [=](uint8_t tag, uint16_t trackedValue) 
+                // Write lives left and score
+                EVE_cmd_dl_burst(DL_COLOR_RGB | TEXT_COLOR);
+                EVE_cmd_number_burst(5, 30, 29, 0, gameState.LivesLeft);
+                EVE_cmd_number_burst(EVE_HSIZE - 10, 30, 29, EVE_OPT_RIGHTX, gameState.Score);
+                
+                // Are we still alive?
+                if (logLivesLeft)
+                    Serial.println(gameState.LivesLeft);
+                if (gameState.LivesLeft > 0)
+                {
+                    logLivesLeft = false;
+                    // Did timer elapse?
+                    if ((gameState.TimeBeforeChange <= 0))
                     {
-
+                        Serial.println("Timer has elapsed");
+                        // Is the mole hiding?
+                        if (gameState.MoleY < 0)
+                        {
+                            // yes, make it come back, reset the timer to the next display time, and accelerate the game
+                            gameState.MoleX = random(10, EVE_HSIZE - mole_png_width - 10);
+                            gameState.MoleY = random(10, EVE_VSIZE - mole_png_height - 10);
+                            gameState.TimeBeforeChange = gameState.NextTimeBetweenChange;
+                            gameState.NextTimeBetweenChange -= gameState.NextTimeBetweenChange / 10; 
+                        }
+                        else
+                        {
+                            // no, the mole has won, remove one life, hide the mole for two seconds
+                            gameState.LivesLeft--;
+                            gameState.MoleY = -2 * mole_png_height;
+                            gameState.TimeBeforeChange = 2000;  
+                        }
                     }
-                );
-                EVE_cmd_dl_burst(TAG(MoleTag)); 
-                EVE_cmd_dl_burst(BITMAP_HANDLE(MoleBitmapHandle));
-                EVE_cmd_dl_burst(BITMAP_LAYOUT(mole_png_format, mole_png_width * mole_png_bytes_per_pixel, mole_png_height));
-                EVE_cmd_dl_burst(BITMAP_SOURCE(MoleSourceAddr));
-                EVE_cmd_dl_burst(PALETTE_SOURCE(MolePaletteAddr));
-                EVE_cmd_dl_burst(BITMAP_SIZE(EVE_NEAREST, EVE_BORDER, EVE_BORDER, mole_png_width, mole_png_height));
-                EVE_cmd_dl_burst(DL_COLOR_RGB | WHITE);
-                EVE_cmd_dl_burst(COLOR_A(255));
-                EVE_cmd_dl_burst(DL_BEGIN | EVE_BITMAPS);
-                EVE_cmd_dl_burst(VERTEX2F(EVE_HSIZE / 2, EVE_VSIZE / 2));
-                EVE_cmd_dl_burst(DL_END);
-                EVE_cmd_dl_burst(BITMAP_HANDLE(0));
-                EVE_cmd_dl_burst(TAG(0)); 
+                }
+                else
+                {
+                    EVE_cmd_romfont_burst(Font34BitmapHandle, 34);
+                    EVE_cmd_dl_burst(DL_COLOR_RGB | 0xDDBB22);
+                    EVE_cmd_text_burst(EVE_HSIZE / 2, 50, Font34BitmapHandle, EVE_OPT_CENTERX, "You lost!");
+
+                    static uint8_t retryTag = 
+                        TagManager::Instance()->GetNextTag(
+                            [&](uint8_t tag, uint16_t trackedValue) 
+                            {
+                                Serial.print("Reseting game state from ");
+                                Serial.print(gameState.LivesLeft);
+                                Serial.print(" lives to ");
+                                Serial.print(StartGameState.LivesLeft);
+                                gameState = StartGameState;
+                                Serial.print(" - now ");
+                                Serial.print(gameState.LivesLeft);
+                                Serial.println();
+                                logLivesLeft = true;
+                            }
+                        );
+                    EVE_cmd_dl_burst(TAG(retryTag)); 
+                    EVE_cmd_text_burst(EVE_HSIZE / 2, EVE_VSIZE / 2, 30, EVE_OPT_CENTERX, "Retry");
+
+                    static uint8_t exitTag = 
+                        TagManager::Instance()->GetNextTag(
+                            [&](uint8_t tag, uint16_t trackedValue) 
+                            {
+                                Serial.print("Setting ContinueToPlay from ");
+                                Serial.print((gameState.ContinueToPlay) ? "true" : "false");
+                                Serial.print(" to false ");
+                                gameState.ContinueToPlay = false;
+                                Serial.print(" - now ");
+                                Serial.print((gameState.ContinueToPlay) ? "true" : "false");
+                                Serial.println();
+                            }
+                        );
+                    EVE_cmd_dl_burst(TAG(exitTag)); 
+                    EVE_cmd_text_burst(EVE_HSIZE / 2, EVE_VSIZE / 2 + 50, 30, EVE_OPT_CENTERX, "Exit");
+
+                    EVE_cmd_dl_burst(TAG(0)); 
+                }
 
                 EVE_cmd_dl_burst(DL_DISPLAY);
                 EVE_cmd_dl_burst(CMD_SWAP);
@@ -211,7 +352,9 @@ namespace EVEopenHAB
                 while (EVE_busy());
             }
 
-            return result;
+            if (logLivesLeft)
+                Serial.print((gameState.ContinueToPlay) ? "true" : "false");
+            return gameState.ContinueToPlay;
         }
     }
 }
