@@ -26,7 +26,6 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include <Arduino.h>
 #include <sys/time.h>
 #include <WiFi.h>
-#include <asyncHTTPrequest.h>
 #include <WString.h>
 #include <ArduinoJson.h>
 #include "EVEopenHAB.h"
@@ -38,6 +37,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #include "EOTouch.h"
 #include "EOIconManager.h"
 #include "EOFourthDimension.h"
+#include "EODownloadManager.h"
 
 #include <EVE.h>
 #include <EVE_commands.h>
@@ -123,7 +123,7 @@ namespace EVEopenHAB
 
     bool requestSent = false;
 
-    void requestReadyStateChange(void* optParm, asyncHTTPrequest* request, int readyState)
+    void requestReadyStateChange(void* optParm, esp32HTTPrequest* request, int readyState)
     {
         if (readyState == 4)
         {
@@ -186,10 +186,7 @@ namespace EVEopenHAB
                 requestSent = false;
             }
         }
-    }    
-
-    // must be a global variable because it needs to survive the end of the MainLoop call below
-    asyncHTTPrequest request;
+    }
 
     static bool fourthDimension = false;
 
@@ -214,10 +211,7 @@ namespace EVEopenHAB
             while (EVE_busy());    
 
             Serial.println(F("Requesting the sitemap"));
-            request.setDebug(true);
-            request.onReadyStateChange(requestReadyStateChange);
-            request.open("GET", SitemapURL);
-            request.send();
+            DownloadManager::Instance().Enqueue(SitemapURL, requestReadyStateChange, nullptr);
         }
 
         if (EVEopenHAB::Touch::MainLoop())

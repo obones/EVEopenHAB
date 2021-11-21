@@ -26,7 +26,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #define EOICONMANAGER_H
 
 #include <vector>
-#include <asyncHTTPrequest.h>
+#include <esp32HTTPrequest.h>
 
 namespace EVEopenHAB 
 {
@@ -55,7 +55,7 @@ namespace EVEopenHAB
 
             IconManager();
 
-            friend void iconRequestReadyStateChange(void*, asyncHTTPrequest*, int);
+            friend void iconRequestReadyStateChange(void*, esp32HTTPrequest*, int);
         public:
             void MainLoop();
 

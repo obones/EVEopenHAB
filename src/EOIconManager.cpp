@@ -23,12 +23,13 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 */
 
-#include <asyncHTTPrequest.h>
+#include <esp32HTTPrequest.h>
 #include <EVE.h>
 
 #include "EOIconManager.h"
 #include "EOSettings.h"
 #include "EOConstants.h"
+#include "EODownloadManager.h"
 
 #include "reload_color.png.h"
 
@@ -43,8 +44,6 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 namespace EVEopenHAB 
 {
-    asyncHTTPrequest iconRequest;
-
     IconManager::IconManager()
     {
         reloadIconAddress = RAM_G_MAX_USABLE_ADDRESS - reload_color_png_byte_count;
@@ -124,7 +123,7 @@ namespace EVEopenHAB
         return &instance;
     }
 
-    void iconRequestReadyStateChange(void* optParm, asyncHTTPrequest* request, int readyState)
+    void iconRequestReadyStateChange(void* optParm, esp32HTTPrequest* request, int readyState)
     {
         if (readyState == 4)
         {
@@ -180,10 +179,7 @@ namespace EVEopenHAB
                 Serial.print("Requesting icon url = ");
                 Serial.println(url);
 
-                iconRequest.setDebug(true);
-                iconRequest.onReadyStateChange(iconRequestReadyStateChange, this);
-                iconRequest.open("GET", url.c_str());
-                iconRequest.send();
+                DownloadManager::Instance().Enqueue(url, iconRequestReadyStateChange, this);
             }
             recordIndex++;
         }
