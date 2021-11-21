@@ -23,7 +23,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 */
 
-//#include <esp32HTTPrequest.h>
+#include <esp32HTTPrequest.h>
 #include <EVE.h>
 
 #include "EODownloadManager.h"
