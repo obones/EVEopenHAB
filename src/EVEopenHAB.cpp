@@ -226,7 +226,10 @@ namespace EVEopenHAB
         if (fourthDimension)
         {
             if (!EVEopenHAB::FourthDimension::MainLoop())
+            {
                 fourthDimension = false;
+                requestSent = false;
+            }
         }
         else
         {
