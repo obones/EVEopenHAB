@@ -197,7 +197,7 @@ namespace EVEopenHAB
         for (int recordIndex = 0; recordIndex < records.size(); recordIndex++)
         {
             iconRecord& record = records[recordIndex];
-            if (record.name == name && record.state == state)
+            if (strcmp(record.name, name) == 0 && strcmp(record.state, state) == 0)
                 return recordIndex + 1;
         } 
 
