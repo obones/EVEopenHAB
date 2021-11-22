@@ -143,6 +143,8 @@ namespace EVEopenHAB
                 
             if (request->responseHTTPcode() == 200)
             {
+                Serial.println("Icon download success");
+
                 std::lock_guard<std::mutex> lock(manager->recordsMutex);
 
                 IconManager::iconRecord& record = manager->records[manager->indexBeingRetrieved];
@@ -162,6 +164,10 @@ namespace EVEopenHAB
                 request->responseRead(localBuffer, record.bufferLength);
 
                 record.buffer = localBuffer;
+            }
+            else
+            {
+                Serial.printf("Icon download failed: %d\r\n", request->responseHTTPcode());
             }
 
             manager->indexBeingRetrieved = -1;
