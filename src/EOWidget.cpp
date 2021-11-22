@@ -25,13 +25,14 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 #include <cmath>
 #include <EVE.h>
-#include <asyncHTTPrequest.h>
 
 #include "EOWidget.h"
 #include "EOConstants.h"
 #include "EOItem.h"
 #include "EOTagManager.h"
 #include "EOIconManager.h"
+#include "EOPostManager.h"
+#include "EOSettings.h"
 
 #define OHAB_CMD_UP 0
 #define OHAB_CMD_DOWN 1
@@ -208,14 +209,14 @@ void EVE_cmd_track_burst(int16_t x0, int16_t y0, int16_t w0, int16_t h0, int16_t
         }
     }
 
-    asyncHTTPrequest postRequest;
     void Widget::postItemValue(const char* value)
     {
-        postRequest.setDebug(true);
-        //postRequest.abort();
-        postRequest.open("POST", linkedItem.Link().c_str());
-        postRequest.setReqHeader("Content-Type","text/plain");
-        postRequest.send(value);
+        // OpenHAB may give an invalid host name in the sitemap links, so we replace with the host we have in the settings
+        // We look for a forward slash from index 8 to skip the "https://" prefix. Note that it also works for "http://" 
+        // because the hostname has to be at least one character long.
+        String url = BASE_URL + linkedItem.Link().substring(linkedItem.Link().indexOf('/', 8));  
+
+        PostManager::Instance().Enqueue(url, value);
     }
 
     void Widget::sendCommand(uint8_t tag, int command)
