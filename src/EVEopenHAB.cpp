@@ -134,6 +134,7 @@ namespace EVEopenHAB
 
             if (request->responseHTTPcode() == 200)
             {
+                Serial.println("Sitemap download success");
                 //Serial.println(request->available());
 
                 String responseText = request->responseText();
@@ -193,6 +194,7 @@ namespace EVEopenHAB
             }
             else
             {
+                Serial.printf("Sitemap download failed: %d\r\n", request->responseHTTPcode());
                 requestSent = false;
             }
         }
