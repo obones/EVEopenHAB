@@ -42,6 +42,7 @@ namespace EVEopenHAB
             String id;
             std::vector<Widget*> widgets;
             bool isDirty = true;
+            bool isReady = false;
             OnReloadTouched onReloadTouched;
         protected:
             void SetDirty();
@@ -58,6 +59,8 @@ namespace EVEopenHAB
             String Id();
             std::vector<Widget*> Widgets();
             bool IsDirty();
+            bool IsReady();
+            void SetReady();
     };
 }
 

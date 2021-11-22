@@ -148,4 +148,13 @@ namespace EVEopenHAB
         return isDirty;
     }
 
+    bool Homepage::IsReady()
+    {
+        return isReady;
+    }
+
+    void Homepage::SetReady()
+    {
+        isReady = true;
+    }
 }
