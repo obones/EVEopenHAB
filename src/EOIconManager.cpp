@@ -142,7 +142,7 @@ namespace EVEopenHAB
                 IconManager::iconRecord& record = manager->records[manager->indexBeingRetrieved];
 
                 record.bufferLength = request->available();
-                record.buffer = new byte[record.bufferLength];
+                uint8_t *localBuffer = new byte[record.bufferLength];
 
                 Serial.print(F("  For record "));
                 Serial.print(manager->indexBeingRetrieved);
@@ -153,7 +153,9 @@ namespace EVEopenHAB
                 Serial.print(record.bufferLength);
                 Serial.println();
 
-                request->responseRead(record.buffer, record.bufferLength);
+                request->responseRead(localBuffer, record.bufferLength);
+
+                record.buffer = localBuffer;
             }
 
             manager->indexBeingRetrieved = -1;
