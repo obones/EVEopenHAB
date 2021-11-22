@@ -26,6 +26,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 #define EOICONMANAGER_H
 
 #include <vector>
+#include <mutex>
 #include <esp32HTTPrequest.h>
 
 namespace EVEopenHAB 
@@ -46,6 +47,7 @@ namespace EVEopenHAB
             } iconRecord;
             
             std::vector<iconRecord> records;
+            mutable std::mutex recordsMutex;
 
             bool staticIconsLoaded = false;
             uint32_t reloadIconAddress = 0;

@@ -59,52 +59,56 @@ namespace EVEopenHAB
         }
 
         startRetrieval();
-        
-        for (int recordIndex = 0; recordIndex < records.size(); recordIndex++)
-        {
-            iconRecord& record = records[recordIndex];
 
-            switch (record.bitmapState)
+        {        
+            std::lock_guard<std::mutex> lock(recordsMutex);
+            for (int recordIndex = 0; recordIndex < records.size(); recordIndex++)
             {
-                case BitmapState::Allocated:
-                    if (record.buffer == nullptr)
-                    {
-                        /*Serial.print("Setting memory for ");
-                        Serial.print(recordIndex);
-                        Serial.print(" - address = ");
-                        Serial.print(record.address);
-                        Serial.print(" - byte count = ");
-                        Serial.print(ICON_BYTE_COUNT);
-                        Serial.println();*/
+                iconRecord& record = records[recordIndex];
 
-                        //EVE_cmd_memzero(record.address, ICON_BYTE_COUNT);
-                        EVE_cmd_memset(record.address, 0xF0, ICON_BYTE_COUNT);
-                        while (EVE_busy());
-                        
-                        record.bitmapState = BitmapState::Initialized;
-                        break; 
-                    }
-                    // break is inside the test because if record.buffer is already available, we want to 
-                    // fall through the call to load image, saving a useless call to memzero
-                case BitmapState::Initialized:
-                    if (record.buffer != nullptr)
-                    {
-                        Serial.print("Loading image for ");
-                        Serial.print(recordIndex);
-                        Serial.print(" - address = ");
-                        Serial.print(record.address);
-                        Serial.println();
+                switch (record.bitmapState)
+                {
+                    case BitmapState::Allocated:
+                        if (record.buffer == nullptr)
+                        {
+                            /*Serial.print("Setting memory for ");
+                            Serial.print(recordIndex);
+                            Serial.print(" - address = ");
+                            Serial.print(record.address);
+                            Serial.print(" - byte count = ");
+                            Serial.print(ICON_BYTE_COUNT);
+                            Serial.println();*/
 
-                        EVE_cmd_loadimage(record.address, EVE_OPT_NODL, record.buffer, record.bufferLength);
-                        record.bitmapState = BitmapState::Loaded;
+                            //EVE_cmd_memzero(record.address, ICON_BYTE_COUNT);
+                            EVE_cmd_memset(record.address, 0xF0, ICON_BYTE_COUNT);
+                            while (EVE_busy());
+                            
+                            record.bitmapState = BitmapState::Initialized;
+                            break; 
+                        }
+                        // break is inside the test because if record.buffer is already available, we want to 
+                        // fall through the call to load image, saving a useless call to memzero
+                    case BitmapState::Initialized:
+                        if (record.buffer != nullptr)
+                        {
+                            /*Serial.print("Loading image for ");
+                            Serial.print(recordIndex);
+                            Serial.print(" - address = ");
+                            Serial.print(record.address);
+                            Serial.println();*/
 
-                        // Release memory now that the image is transferred to EVE
-                        delete record.buffer;
-                        record.buffer = nullptr;
-                    }
-                    break;
-                case BitmapState::Loaded:
-                    break; // nothing, the image has already been transferred and loaded via LOADIMAGE
+                            EVE_cmd_loadimage(record.address, EVE_OPT_NODL, record.buffer, record.bufferLength);
+                            record.bitmapState = BitmapState::Loaded;
+
+                            // Release memory now that the image is transferred to EVE, use a local reference to avoid having record.buffer point to deleted memory
+                            uint8_t* buffer = record.buffer;
+                            record.buffer = nullptr;
+                            delete buffer;
+                        }
+                        break;
+                    case BitmapState::Loaded:
+                        break; // nothing, the image has already been transferred and loaded via LOADIMAGE
+                }
             }
         }
     }
@@ -139,6 +143,8 @@ namespace EVEopenHAB
                 
             if (request->responseHTTPcode() == 200)
             {
+                std::lock_guard<std::mutex> lock(manager->recordsMutex);
+
                 IconManager::iconRecord& record = manager->records[manager->indexBeingRetrieved];
 
                 record.bufferLength = request->available();
@@ -167,22 +173,28 @@ namespace EVEopenHAB
         int recordIndex = 0;
         while (indexBeingRetrieved < 0 && recordIndex < records.size())
         {
-            iconRecord& record = records[recordIndex];
-            if (record.buffer == nullptr)
             {
-                indexBeingRetrieved = recordIndex;
+                std::lock_guard<std::mutex> lock(recordsMutex);
 
-                String url = BASE_URL;
-                url += "/icon/";
-                url += record.name;
-                url += "?state=";
-                url += record.state;
-                url += "&format=png&iconset=";
-                url += ICON_SET_NAME;
-                Serial.print("Requesting icon url = ");
-                Serial.println(url);
+                iconRecord& record = records[recordIndex];
+                if (record.buffer == nullptr)
+                {
+                    Serial.printf("--> no buffer for record, preparing request (%d will be %d)\r\n", indexBeingRetrieved, recordIndex);
+                    indexBeingRetrieved = recordIndex;
 
-                DownloadManager::Instance().Enqueue(url, iconRequestReadyStateChange, this);
+                    String url = BASE_URL;
+                    url += "/icon/";
+                    url += record.name;
+                    url += "?state=";
+                    url += record.state;
+                    url += "&format=png&iconset=";
+                    url += ICON_SET_NAME;
+                    
+                    Serial.print("Requesting icon url = ");
+                    Serial.println(url);
+
+                    DownloadManager::Instance().Enqueue(url, iconRequestReadyStateChange, this);
+                }
             }
             recordIndex++;
         }
@@ -195,29 +207,36 @@ namespace EVEopenHAB
         Serial.print(" - state = ");
         Serial.print(reinterpret_cast<uint32_t>(state));
         Serial.println();*/
-
-        // Try to find a preexisting icon
-        for (int recordIndex = 0; recordIndex < records.size(); recordIndex++)
+        int8_t result = -1;
         {
-            iconRecord& record = records[recordIndex];
-            if (strcmp(record.name, name) == 0 && strcmp(record.state, state) == 0)
-                return recordIndex + 1;
-        } 
+            std::lock_guard<std::mutex> lock(recordsMutex);
 
-        // If not found, allocate a new one, downards from the top of RAM_G
-        //uint32_t newAddress = RAM_G_MAX_USABLE_ADDRESS - ICON_BYTE_COUNT * (records.size() + 1);
-        // If not found, allocate a new, upwards from the bottom of RAM_G
-        uint32_t newAddress = RAM_G_BOTTOM + ICON_BYTE_COUNT * records.size();
+            // Try to find a preexisting icon
+            for (int recordIndex = 0; recordIndex < records.size(); recordIndex++)
+            {
+                iconRecord& record = records[recordIndex];
+                if (strcmp(record.name, name) == 0 && strcmp(record.state, state) == 0)
+                    return recordIndex + 1;
+            } 
 
-        records.push_back( { .name = name, .state = state, .address = newAddress, .buffer = nullptr, .bufferLength = 0, .bitmapState = BitmapState::Allocated } );
+            // If not found, allocate a new one, downards from the top of RAM_G
+            //uint32_t newAddress = RAM_G_MAX_USABLE_ADDRESS - ICON_BYTE_COUNT * (records.size() + 1);
+            // If not found, allocate a new, upwards from the bottom of RAM_G
+            uint32_t newAddress = RAM_G_BOTTOM + ICON_BYTE_COUNT * records.size();
+
+            records.push_back( { .name = name, .state = state, .address = newAddress, .buffer = nullptr, .bufferLength = 0, .bitmapState = BitmapState::Allocated } );
+            
+            result = records.size();
+        }
 
         startRetrieval();
 
-        return records.size();
+        return result;
     }
 
     uint32_t IconManager::GetAddress(int8_t index)
     {
+        std::lock_guard<std::mutex> lock(recordsMutex);
         if (index > 0 && index <= records.size())
         {
             iconRecord& record = records[index - 1];
@@ -229,6 +248,7 @@ namespace EVEopenHAB
 
     void IconManager::BurstIcon(int8_t index, int16_t x, int16_t y)
     {
+        std::lock_guard<std::mutex> lock(recordsMutex);
         if (index > 0 && index <= records.size())
         {
             iconRecord& record = records[index - 1];
