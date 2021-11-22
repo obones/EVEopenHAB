@@ -177,7 +177,7 @@ namespace EVEopenHAB
                 std::lock_guard<std::mutex> lock(recordsMutex);
 
                 iconRecord& record = records[recordIndex];
-                if (record.buffer == nullptr)
+                if (record.buffer == nullptr && record.bitmapState < BitmapState::Loaded)
                 {
                     Serial.printf("--> no buffer for record, preparing request (%d will be %d)\r\n", indexBeingRetrieved, recordIndex);
                     indexBeingRetrieved = recordIndex;
