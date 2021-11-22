@@ -124,7 +124,7 @@ namespace EVEopenHAB
         
         EVE_end_cmd_burst();
         
-        Serial.println("    Second busy loop");
+        //Serial.println("    Second busy loop");
         while (EVE_busy());    
     }
 

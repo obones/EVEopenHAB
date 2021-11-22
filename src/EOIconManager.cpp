@@ -150,14 +150,14 @@ namespace EVEopenHAB
                 record.bufferLength = request->available();
                 uint8_t *localBuffer = new byte[record.bufferLength];
 
-                Serial.print(F("  For record "));
+                /*Serial.print(F("  For record "));
                 Serial.print(manager->indexBeingRetrieved);
                 Serial.print(F(" - name = "));
                 Serial.print(record.name);
                 Serial.println();
                 Serial.print(F("  Buffer length = "));
                 Serial.print(record.bufferLength);
-                Serial.println();
+                Serial.println();*/
 
                 request->responseRead(localBuffer, record.bufferLength);
 
@@ -179,7 +179,7 @@ namespace EVEopenHAB
                 iconRecord& record = records[recordIndex];
                 if (record.buffer == nullptr && record.bitmapState < BitmapState::Loaded)
                 {
-                    Serial.printf("--> no buffer for record, preparing request (%d will be %d)\r\n", indexBeingRetrieved, recordIndex);
+                    //Serial.printf("--> no buffer for record, preparing request (%d will be %d)\r\n", indexBeingRetrieved, recordIndex);
                     indexBeingRetrieved = recordIndex;
 
                     String url = BASE_URL;
