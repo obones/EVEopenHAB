@@ -58,6 +58,8 @@ namespace EVEopenHAB
             staticIconsLoaded = true;
         }
 
+        startRetrieval();
+        
         for (int recordIndex = 0; recordIndex < records.size(); recordIndex++)
         {
             iconRecord& record = records[recordIndex];
@@ -155,7 +157,6 @@ namespace EVEopenHAB
             }
 
             manager->indexBeingRetrieved = -1;
-            manager->startRetrieval();
         }
     }
 
