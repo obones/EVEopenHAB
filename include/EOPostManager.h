@@ -39,6 +39,7 @@ namespace EVEopenHAB
             {
                 String URL;
                 String Value;
+                int Retries;
                 PostManager* Manager;
             } postRecord;
 
@@ -48,6 +49,8 @@ namespace EVEopenHAB
 
             friend void postTask(void * managerPtr);
             friend void readyStateChange(void*, esp32HTTPrequest*, int);
+
+            void Enqueue(String url, String value, int retries);
         public:
             void Enqueue(String url, String value);
 

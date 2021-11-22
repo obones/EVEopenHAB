@@ -31,6 +31,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR TH
 
 namespace EVEopenHAB 
 {
+    constexpr int MAX_RETRIES = 10;
 
     void readyStateChange(void* optParm, esp32HTTPrequest* request, int readyState)
     {
@@ -41,7 +42,10 @@ namespace EVEopenHAB
             {
                 PostManager::postRecord* record = reinterpret_cast<PostManager::postRecord*>(optParm);
                 
-                record->Manager->Enqueue(record->URL, record->Value);
+                if (record->Retries < MAX_RETRIES)
+                {
+                    record->Manager->Enqueue(record->URL, record->Value, record->Retries + 1);
+                }
             }
         }
     }
@@ -70,9 +74,14 @@ namespace EVEopenHAB
         xTaskCreate(postTask, "pst", 4096, this, 1, nullptr);
     }
 
+    void PostManager::Enqueue(String url, String value, int retries)
+    {
+        postQueue.enqueue({ .URL = url, .Value = value, .Retries = retries, .Manager = this });
+    }
+    
     void PostManager::Enqueue(String url, String value)
     {
-        postQueue.enqueue({ .URL = url, .Value = value, .Manager = this });
+        Enqueue(url, value, 0);
     }
 
     PostManager& PostManager::Instance()
