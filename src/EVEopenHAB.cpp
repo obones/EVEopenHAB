@@ -167,7 +167,12 @@ namespace EVEopenHAB
                 IconManager::Instance()->Reset();
 
                 if (homepage)
-                    delete homepage;
+                {
+                    // Use a local pointers to call delete so that the global pointer never points to a deleted object
+                    Homepage* localHomepage = homepage;
+                    homepage = nullptr;
+                    delete localHomepage;
+                }
                     
                 homepage = new Homepage(doc["homepage"].as<JsonObject>());
                 homepage->SetOnReloadTouched(
