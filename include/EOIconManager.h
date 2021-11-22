@@ -50,7 +50,7 @@ namespace EVEopenHAB
             bool staticIconsLoaded = false;
             uint32_t reloadIconAddress = 0;
 
-            int16_t indexBeingRetrieved = -1;
+            volatile int16_t indexBeingRetrieved = -1;
             void startRetrieval();
 
             IconManager();
