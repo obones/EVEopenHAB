@@ -133,9 +133,9 @@ namespace EVEopenHAB
     {
         if (readyState == 4)
         {
-            Serial.println(F("Received a response, processing..."));
+            /*Serial.println(F("Received a response, processing..."));
             Serial.print(F("  HTTP response code: "));
-            Serial.println(request->responseHTTPcode());
+            Serial.println(request->responseHTTPcode());*/
 
             request->setDebug(false);
 

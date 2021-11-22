@@ -127,9 +127,9 @@ namespace EVEopenHAB
     {
         if (readyState == 4)
         {
-            Serial.println(F("Received a response, processing..."));
+            /*Serial.println(F("Received a response, processing..."));
             Serial.print(F("  HTTP response code: "));
-            Serial.println(request->responseHTTPcode());
+            Serial.println(request->responseHTTPcode());*/
             request->setDebug(false);
 
             if (request->responseHTTPcode() == 200)
@@ -141,7 +141,7 @@ namespace EVEopenHAB
                 Serial.println(responseText);
                 Serial.println();
 
-                Serial.println(F("Deserializing JSON"));
+                //Serial.println(F("Deserializing JSON"));
                 StaticJsonDocument<2048> doc;
 
                 DeserializationError error = deserializeJson(doc, responseText.c_str(), responseText.length());
@@ -183,13 +183,13 @@ namespace EVEopenHAB
                     }
                 );
                 homepage->SetReady();
-                for (int widgetIndex = 0; widgetIndex < homepage->Widgets().size(); widgetIndex++)
+                /*for (int widgetIndex = 0; widgetIndex < homepage->Widgets().size(); widgetIndex++)
                 {
                     Serial.print("Widget ");
                     Serial.print(widgetIndex);
                     Serial.print(": ");
                     Serial.println(homepage->Widgets()[widgetIndex]->Label().c_str());
-                }
+                }*/
             }
             else
             {
