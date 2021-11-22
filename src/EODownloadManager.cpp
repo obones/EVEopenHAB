@@ -43,7 +43,7 @@ namespace EVEopenHAB
             esp32HTTPrequest request;
 
             request.setDebug(true);
-            request.setClientBufferSize(1024);
+            request.setClientBufferSize(1040);
             request.onReadyStateChange(record.Callback, record.Parameter);
             request.open("GET", record.URL.c_str());
             request.send();
