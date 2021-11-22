@@ -181,6 +181,7 @@ namespace EVEopenHAB
                         requestSent = false;
                     }
                 );
+                homepage->SetReady();
                 for (int widgetIndex = 0; widgetIndex < homepage->Widgets().size(); widgetIndex++)
                 {
                     Serial.print("Widget ");
@@ -241,7 +242,7 @@ namespace EVEopenHAB
             EVEopenHAB::IconManager::Instance()->MainLoop();
 
             // homepage display
-            if (homepage && homepage->IsDirty())
+            if (homepage && homepage->IsDirty() && homepage->IsReady())
             {
                 homepage->LayoutChildren();
                 homepage->Render();
