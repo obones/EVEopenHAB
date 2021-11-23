@@ -76,6 +76,7 @@ namespace EVEopenHAB
         const GameState StartGameState = { .MoleX = EVE_HSIZE / 2, .MoleY = EVE_VSIZE / 2, .TimeBeforeChange = 3000, .NextTimeBetweenChange = 3000, .Score = 0, .LivesLeft = 3, .ContinueToPlay = true};
 
         GameState gameState = StartGameState;
+        uint32_t previous_millis = 0;
 
         void Enter()
         {
@@ -245,12 +246,14 @@ namespace EVEopenHAB
 
             EVE_end_cmd_burst();
             while (EVE_busy());
+
+            gameState = StartGameState;
+            previous_millis = 0;
         }
 
         bool MainLoop()
         {
             uint32_t current_millis = millis();
-            static uint32_t previous_millis = 0;
             static bool logLivesLeft = false;
 
             if((current_millis - previous_millis) > 4) // execute the code every 5 milli-seconds
