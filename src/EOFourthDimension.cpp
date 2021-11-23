@@ -158,14 +158,14 @@ namespace EVEopenHAB
                     stars[starIndex].X += stars[starIndex].deltaX;
                     stars[starIndex].Y += stars[starIndex].deltaY;
 
-                    Serial.print("Writing star ");
+                    /*Serial.print("Writing star ");
                     Serial.print(starIndex);
                     Serial.print(" (");
                     Serial.print(stars[starIndex].X);
                     Serial.print("; ");
                     Serial.print(stars[starIndex].Y);
                     Serial.printf(") at address %x", starsRAMAddress + starIndex * sizeof(int32_t));
-                    Serial.println();
+                    Serial.println();*/
 
                     EVE_memWrite32(starsRAMAddress + starIndex * sizeof(int32_t), VERTEX2F(stars[starIndex].X, stars[starIndex].Y));
                 }
