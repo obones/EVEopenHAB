@@ -218,7 +218,7 @@ namespace EVEopenHAB
             EVE_cmd_text_burst(5, 5, 29, 0, "Lives");
             EVE_cmd_text_burst(EVE_HSIZE - 10, 5, 29, EVE_OPT_RIGHTX, "Score");
 
-            static uint8_t MoleTag = TagManager::Instance()->GetNextTag(
+            uint8_t MoleTag = TagManager::Instance()->GetNextTag(
                 [&](uint8_t tag, uint16_t trackedValue) 
                 {
                     // mole has been touched, award some points
@@ -311,7 +311,7 @@ namespace EVEopenHAB
                     EVE_cmd_dl_burst(DL_COLOR_RGB | 0xDDBB22);
                     EVE_cmd_text_burst(EVE_HSIZE / 2, 50, Font34BitmapHandle, EVE_OPT_CENTERX, "You lost!");
 
-                    static uint8_t retryTag = 
+                    uint8_t retryTag = 
                         TagManager::Instance()->GetNextTag(
                             [&](uint8_t tag, uint16_t trackedValue) 
                             {
@@ -329,7 +329,7 @@ namespace EVEopenHAB
                     EVE_cmd_dl_burst(TAG(retryTag)); 
                     EVE_cmd_text_burst(EVE_HSIZE / 2, EVE_VSIZE / 2, 30, EVE_OPT_CENTERX, "Retry");
 
-                    static uint8_t exitTag = 
+                    uint8_t exitTag = 
                         TagManager::Instance()->GetNextTag(
                             [&](uint8_t tag, uint16_t trackedValue) 
                             {
