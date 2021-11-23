@@ -72,8 +72,10 @@ namespace EVEopenHAB
             int32_t Score;
             int8_t LivesLeft;
             bool ContinueToPlay;
+            uint8_t retryTag;
+            uint8_t exitTag;
         } GameState;
-        const GameState StartGameState = { .MoleX = EVE_HSIZE / 2, .MoleY = EVE_VSIZE / 2, .TimeBeforeChange = 3000, .NextTimeBetweenChange = 3000, .Score = 0, .LivesLeft = 3, .ContinueToPlay = true};
+        const GameState StartGameState = { .MoleX = EVE_HSIZE / 2, .MoleY = EVE_VSIZE / 2, .TimeBeforeChange = 3000, .NextTimeBetweenChange = 3000, .Score = 0, .LivesLeft = 3, .ContinueToPlay = true, .retryTag = 0, .exitTag = 0 };
 
         GameState gameState = StartGameState;
         uint32_t previous_millis = 0;
@@ -311,38 +313,40 @@ namespace EVEopenHAB
                     EVE_cmd_dl_burst(DL_COLOR_RGB | 0xDDBB22);
                     EVE_cmd_text_burst(EVE_HSIZE / 2, 50, Font34BitmapHandle, EVE_OPT_CENTERX, "You lost!");
 
-                    uint8_t retryTag = 
-                        TagManager::Instance()->GetNextTag(
-                            [&](uint8_t tag, uint16_t trackedValue) 
-                            {
-                                Serial.print("Reseting game state from ");
-                                Serial.print(gameState.LivesLeft);
-                                Serial.print(" lives to ");
-                                Serial.print(StartGameState.LivesLeft);
-                                gameState = StartGameState;
-                                Serial.print(" - now ");
-                                Serial.print(gameState.LivesLeft);
-                                Serial.println();
-                                logLivesLeft = true;
-                            }
-                        );
-                    EVE_cmd_dl_burst(TAG(retryTag)); 
+                    if (gameState.retryTag == 0)
+                        gameState.retryTag = 
+                            TagManager::Instance()->GetNextTag(
+                                [&](uint8_t tag, uint16_t trackedValue) 
+                                {
+                                    Serial.print("Reseting game state from ");
+                                    Serial.print(gameState.LivesLeft);
+                                    Serial.print(" lives to ");
+                                    Serial.print(StartGameState.LivesLeft);
+                                    gameState = StartGameState;
+                                    Serial.print(" - now ");
+                                    Serial.print(gameState.LivesLeft);
+                                    Serial.println();
+                                    logLivesLeft = true;
+                                }
+                            );
+                    EVE_cmd_dl_burst(TAG(gameState.retryTag)); 
                     EVE_cmd_text_burst(EVE_HSIZE / 2, EVE_VSIZE / 2, 30, EVE_OPT_CENTERX, "Retry");
 
-                    uint8_t exitTag = 
-                        TagManager::Instance()->GetNextTag(
-                            [&](uint8_t tag, uint16_t trackedValue) 
-                            {
-                                Serial.print("Setting ContinueToPlay from ");
-                                Serial.print((gameState.ContinueToPlay) ? "true" : "false");
-                                Serial.print(" to false ");
-                                gameState.ContinueToPlay = false;
-                                Serial.print(" - now ");
-                                Serial.print((gameState.ContinueToPlay) ? "true" : "false");
-                                Serial.println();
-                            }
-                        );
-                    EVE_cmd_dl_burst(TAG(exitTag)); 
+                    if (gameState.exitTag == 0)
+                        gameState.exitTag = 
+                            TagManager::Instance()->GetNextTag(
+                                [&](uint8_t tag, uint16_t trackedValue) 
+                                {
+                                    Serial.print("Setting ContinueToPlay from ");
+                                    Serial.print((gameState.ContinueToPlay) ? "true" : "false");
+                                    Serial.print(" to false ");
+                                    gameState.ContinueToPlay = false;
+                                    Serial.print(" - now ");
+                                    Serial.print((gameState.ContinueToPlay) ? "true" : "false");
+                                    Serial.println();
+                                }
+                            );
+                    EVE_cmd_dl_burst(TAG(gameState.exitTag)); 
                     EVE_cmd_text_burst(EVE_HSIZE / 2, EVE_VSIZE / 2 + 50, 30, EVE_OPT_CENTERX, "Exit");
 
                     EVE_cmd_dl_burst(TAG(0)); 
