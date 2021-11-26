@@ -200,7 +200,6 @@ namespace EVEopenHAB
             // We also create a "static" display list that gets all the commands that never change from one iteration to the next
             // This saves a lot of bandwidth on the SPI bus
             EVE_cmd_newlist_burst(STATIC_DL);
-            EVE_cmd_dl_burst(CMD_DLSTART); 
             EVE_cmd_dl_burst(TAG(0)); 
             EVE_cmd_dl_burst(VERTEX_FORMAT(0));
 
@@ -270,8 +269,6 @@ namespace EVEopenHAB
                 // Burst the periodic display list, that calls the RAM based static display list
                 EVE_start_cmd_burst();
                 EVE_cmd_dl_burst(CMD_DLSTART); 
-                EVE_cmd_dl_burst(TAG(0)); 
-                EVE_cmd_dl_burst(VERTEX_FORMAT(0));
                 EVE_cmd_calllist_burst(STATIC_DL);
 
                 // Write lives left and score
