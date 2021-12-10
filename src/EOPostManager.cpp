@@ -61,7 +61,6 @@ namespace EVEopenHAB
             esp32HTTPrequest request;
 
             request.setDebug(false);
-            request.setClientBufferSize(1040);
             request.onReadyStateChange(readyStateChange, &record);
             request.open("POST", record.URL.c_str());
             request.setReqHeader("Content-Type","text/plain");
